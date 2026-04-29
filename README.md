@@ -10,11 +10,28 @@ PowerPoint Office アドイン（VBA ではなく Office.js）。図形操作の
 
 実装の進行状況は [`TASKS.md`](./TASKS.md) を参照してください。
 
+## クイックスタート（Windows ユーザー向け）
+
+PowerPoint で動作確認したいだけなら、以下の手順だけで OK です：
+
+1. **Node.js 22 以上**をインストール（[nodejs.org](https://nodejs.org/) から LTS 版）。
+2. このリポジトリを Windows のフォルダに clone（例：`C:\Users\<あなた>\Documents\dev\ppt-tools`）。
+3. リポジトリ直下の **`start.cmd` をダブルクリック**。
+
+`start.cmd` が自動で：
+
+1. Node.js のバージョン確認
+2. `npm install`（初回のみ。数分かかる）
+3. 開発用証明書のインストール（初回のみ。**UAC ダイアログが出たら「はい」**）
+4. dev サーバ起動 + アドインのサイドロード + PowerPoint 起動
+
+PowerPoint が開いたらリボンの **ホーム** タブ右端の **ppt-tools** グループから **Open ppt-tools** をクリックしてタスクペインを開いてください。終了するときは `start.cmd` のウィンドウを閉じる、または別の PowerShell で `npm run stop:debug`。
+
 ## 必要環境
 
-- **Node.js 22.x**（`engines` フィールドで `>=22 <23` を強制）。
-- **VS Code + Dev Containers 拡張**（推奨。下記「devcontainer での開発」参照）。
-- **Windows ホスト + PowerPoint（Microsoft 365）**：アドインの手動サイドロード検証に必要。
+- **Node.js 22 以上**（`engines` フィールド）。
+- **Windows + PowerPoint（Microsoft 365）**：アドインの実機検証用。
+- **VS Code + Dev Containers 拡張**（オプション）：Linux 側でコード品質チェック（typecheck / lint / test / build）するときに便利。
 
 ## どこで何を実行するか
 
