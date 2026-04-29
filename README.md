@@ -16,9 +16,20 @@ PowerPoint Office アドイン（VBA ではなく Office.js）。図形操作の
 - **VS Code + Dev Containers 拡張**（推奨。下記「devcontainer での開発」参照）。
 - **Windows ホスト + PowerPoint（Microsoft 365）**：アドインの手動サイドロード検証に必要。
 
-## devcontainer での開発（推奨）
+## どこで何を実行するか
 
-開発はすべて devcontainer の中で行います。ホスト機に Node を入れる必要はありません。
+このプロジェクトには「コード品質チェック用」と「PowerPoint 実機検証用」の 2 系統の作業があり、それぞれ実行場所が違います。
+
+| やりたいこと                        | コマンド                             | 実行場所                                                                                                                                                                 |
+| ----------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 型検査・Lint・ユニットテスト        | `npm run validate`                   | **devcontainer / 任意**                                                                                                                                                  |
+| 本番ビルド                          | `npm run build`                      | **devcontainer / 任意**                                                                                                                                                  |
+| マニフェスト検証                    | `npm run manifest:validate`          | **devcontainer / 任意**                                                                                                                                                  |
+| 開発用証明書のインストール          | `npx office-addin-dev-certs install` | **Windows ホスト**（PowerShell を管理者権限で）。Linux／WSL／devcontainer で実行しても PowerPoint からは信頼されません                                                   |
+| 開発サーバ起動（PowerPoint 連携用） | `npm run dev`                        | **Windows ホスト**。dev-certs は実行ユーザーのホーム直下（`~/.office-addin-dev-certs/`）から読まれるため、証明書をインストールした OS と同じ環境で起動する必要があります |
+| サイドロード                        | `npm run start:debug`                | **Windows ホスト**                                                                                                                                                       |
+
+## devcontainer での開発（コード品質作業）
 
 1. このフォルダを VS Code で開く。
 2. プロンプトが出たら **「コンテナで再度開く」**（Reopen in Container）を選ぶ。コマンドパレットからは `Dev Containers: Reopen in Container`。
@@ -29,15 +40,25 @@ PowerPoint Office アドイン（VBA ではなく Office.js）。図形操作の
    ```
    これで `typecheck` → `lint` → `test` が一括実行されます。
 
-## ホスト直接での開発（代替）
+devcontainer 内では PowerPoint 連携の動作確認はできません（dev-certs を Windows 側に配置できないため）。サイドロード検証は次項の「Windows ホストでの開発」を使ってください。
 
-devcontainer を使わない場合：
+## Windows ホストでの開発（PowerPoint 実機検証）
 
-```bash
-nvm use 22       # 任意の Node 22 マネージャでも可
+PowerPoint と連携させて動作確認するときは、Windows 側に Node 22 を入れて Windows のターミナルから操作します。devcontainer / WSL の Linux 側で `npm run dev` しても PowerPoint からは読み込めません。
+
+```powershell
+# 管理者権限の PowerShell（初回のみ）
+nvm use 22
 npm install
-npm run validate
+npx office-addin-dev-certs install   # UAC ダイアログで「はい」
 ```
+
+```powershell
+# 通常の PowerShell（毎回）
+npm run dev
+```
+
+`npm run dev` が `https://localhost:3000` を起動したら、別の Windows ターミナルから手動でサイドロードします（次節「Windows PowerPoint への手動サイドロード」を参照）。
 
 ## npm スクリプト
 
@@ -97,13 +118,13 @@ npm run validate
 
 ### 事前準備（Windows ホスト上で一度だけ）
 
-1. 開発用証明書をインストールし、PowerPoint が `https://localhost:3000` を信頼できるようにします：
+1. 開発用証明書をインストールし、PowerPoint が `https://localhost:3000` を信頼できるようにします。**必ず Windows のターミナル（PowerShell を管理者権限で起動）で実行**してください — devcontainer / WSL の Linux 側で実行しても PowerPoint の証明書ストアには登録されず、UAC ダイアログも出ないので待っても完了しません：
 
-   ```bash
+   ```powershell
    npx office-addin-dev-certs install
    ```
 
-   自己署名 CA を生成して Windows の証明書ストアに登録します。生成される `*.pem` / `*.crt` ファイルは `.gitignore` 済みです。
+   実行直後に出る UAC ダイアログで「はい」を選択。完了メッセージ（`You now have trusted access to https://localhost.`）が表示されれば成功です。自己署名 CA を生成して Windows の証明書ストアに登録します。生成される `*.pem` / `*.crt` ファイルは `.gitignore` 済みです。
 
 2. Windows ホスト上に「共有フォルダカタログ」用のフォルダを作成します（例：`C:\OfficeAddins\ppt-tools`）。リポジトリ直下の `manifest.xml` をそのフォルダにコピーします。
 
