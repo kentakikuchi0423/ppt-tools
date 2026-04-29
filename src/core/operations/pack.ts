@@ -1,26 +1,20 @@
-import type { Shape } from '../types.js';
+import type { OperationResult, Shape } from '../types.js';
 
-// FR-1〜FR-4: zero-gap packing along a single axis. The anchor (the shape that
-// keeps its original coordinate) is the most-extreme shape in the pack
-// direction: pack down anchors the top-most shape, pack up anchors the
-// bottom-most, and so on. Other shapes are repositioned so that they touch
-// (zero gap, Q2 default).
+// FR-1〜FR-4: zero-gap packing along a single axis. The anchor (the shape
+// whose coordinate stays fixed) is the shape closest to the side named in
+// the operation:
+//   packDown  → bottom-most stays, others move down to it (pile collapses to the bottom)
+//   packUp    → top-most stays, others move up to it (pile collapses to the top)
+//   packLeft  → left-most stays, others move left to it
+//   packRight → right-most stays, others move right to it
+// Other shapes are repositioned so they touch (zero gap, Q2 default).
 
-export function packDown(shapes: readonly Shape[]): Shape[] {
-  const [first, ...rest] = [...shapes].sort((a, b) => a.top - b.top);
-  if (!first) return [];
-  const result: Shape[] = [{ ...first }];
-  let cursor = first.top + first.height;
-  for (const s of rest) {
-    result.push({ ...s, top: cursor });
-    cursor += s.height;
-  }
-  return result;
-}
+const NEED_TWO_FOR_PACK = '詰めるには図形を 2 つ以上選択してください。';
 
-export function packUp(shapes: readonly Shape[]): Shape[] {
+export function packDown(shapes: readonly Shape[]): OperationResult {
+  if (shapes.length < 2) return { ok: false, reason: NEED_TWO_FOR_PACK };
   const [last, ...rest] = [...shapes].sort((a, b) => b.top - a.top);
-  if (!last) return [];
+  if (!last) return { ok: false, reason: NEED_TWO_FOR_PACK };
   const result: Shape[] = [{ ...last }];
   let cursor = last.top;
   for (const s of rest) {
@@ -28,24 +22,39 @@ export function packUp(shapes: readonly Shape[]): Shape[] {
     result.push({ ...s, top: cursor });
   }
   result.reverse();
-  return result;
+  return { ok: true, shapes: result };
 }
 
-export function packLeft(shapes: readonly Shape[]): Shape[] {
+export function packUp(shapes: readonly Shape[]): OperationResult {
+  if (shapes.length < 2) return { ok: false, reason: NEED_TWO_FOR_PACK };
+  const [first, ...rest] = [...shapes].sort((a, b) => a.top - b.top);
+  if (!first) return { ok: false, reason: NEED_TWO_FOR_PACK };
+  const result: Shape[] = [{ ...first }];
+  let cursor = first.top + first.height;
+  for (const s of rest) {
+    result.push({ ...s, top: cursor });
+    cursor += s.height;
+  }
+  return { ok: true, shapes: result };
+}
+
+export function packLeft(shapes: readonly Shape[]): OperationResult {
+  if (shapes.length < 2) return { ok: false, reason: NEED_TWO_FOR_PACK };
   const [first, ...rest] = [...shapes].sort((a, b) => a.left - b.left);
-  if (!first) return [];
+  if (!first) return { ok: false, reason: NEED_TWO_FOR_PACK };
   const result: Shape[] = [{ ...first }];
   let cursor = first.left + first.width;
   for (const s of rest) {
     result.push({ ...s, left: cursor });
     cursor += s.width;
   }
-  return result;
+  return { ok: true, shapes: result };
 }
 
-export function packRight(shapes: readonly Shape[]): Shape[] {
+export function packRight(shapes: readonly Shape[]): OperationResult {
+  if (shapes.length < 2) return { ok: false, reason: NEED_TWO_FOR_PACK };
   const [last, ...rest] = [...shapes].sort((a, b) => b.left - a.left);
-  if (!last) return [];
+  if (!last) return { ok: false, reason: NEED_TWO_FOR_PACK };
   const result: Shape[] = [{ ...last }];
   let cursor = last.left;
   for (const s of rest) {
@@ -53,5 +62,5 @@ export function packRight(shapes: readonly Shape[]): Shape[] {
     result.push({ ...s, left: cursor });
   }
   result.reverse();
-  return result;
+  return { ok: true, shapes: result };
 }

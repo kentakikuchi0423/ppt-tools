@@ -1,16 +1,17 @@
 import type { OperationResult, Shape } from '../types.js';
 
 // FR-6: swap the `left` and `top` of exactly two shapes. Sizes (`width`,
-// `height`) and `id` are preserved. Any selection count other than 2 is a
-// no-op.
+// `height`) and `id` are preserved.
+
+const NEED_EXACTLY_TWO = '位置を入れ替えるには図形をちょうど 2 つ選択してください。';
 
 export function swapPositions(shapes: readonly Shape[]): OperationResult {
   if (shapes.length !== 2) {
-    return { ok: false, reason: 'Select exactly 2 shapes to swap positions.' };
+    return { ok: false, reason: NEED_EXACTLY_TWO };
   }
   const [a, b] = shapes;
   if (!a || !b) {
-    return { ok: false, reason: 'Select exactly 2 shapes to swap positions.' };
+    return { ok: false, reason: NEED_EXACTLY_TWO };
   }
   return {
     ok: true,

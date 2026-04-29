@@ -73,7 +73,7 @@ PowerPoint タスクペイン・アドインを記述する `manifest.xml` を�
 
 **完了条件:** 型が型検査を通り、後続タスクのテストファイルから import できる。
 
-### Task 4 — パック操作
+### Task 4 — 詰める操作
 
 `src/core/operations/pack.ts` を作成し、`packDown`、`packUp`、`packLeft`、`packRight` を `(shapes: Shape[]) => Shape[]` の純粋関数として実装する。
 

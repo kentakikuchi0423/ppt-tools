@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,24 +12,27 @@
   <body>
     <main id="app">
       <h1>ppt-tools</h1>
-      <section aria-label="Pack">
-        <h2>Pack</h2>
+      <section aria-label="詰める">
+        <h2>詰める</h2>
         <div class="row">
-          <button id="pack-up" type="button">Up</button>
-          <button id="pack-down" type="button">Down</button>
-          <button id="pack-left" type="button">Left</button>
-          <button id="pack-right" type="button">Right</button>
+          <button id="pack-up" type="button">上に詰める</button>
+          <button id="pack-down" type="button">下に詰める</button>
+          <button id="pack-left" type="button">左に詰める</button>
+          <button id="pack-right" type="button">右に詰める</button>
         </div>
       </section>
-      <section aria-label="Align">
-        <h2>Align</h2>
-        <button id="align-heights" type="button">Align heights</button>
+      <section aria-label="揃える">
+        <h2>揃える</h2>
+        <div class="row">
+          <button id="align-heights" type="button">高さを揃える</button>
+          <button id="align-widths" type="button">幅を揃える</button>
+        </div>
       </section>
-      <section aria-label="Swap">
-        <h2>Swap</h2>
-        <button id="swap-positions" type="button">Swap positions</button>
+      <section aria-label="入れ替え">
+        <h2>入れ替え</h2>
+        <button id="swap-positions" type="button">位置を入れ替える</button>
       </section>
-      <section aria-label="Status" id="status-section">
+      <section aria-label="ステータス" id="status-section">
         <p id="status" role="status" aria-live="polite"></p>
       </section>
     </main>
