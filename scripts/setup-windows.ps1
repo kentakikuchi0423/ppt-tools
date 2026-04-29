@@ -3,9 +3,10 @@
 # Run via the start.cmd wrapper at the repo root (double-click it), or directly:
 #   pwsh -ExecutionPolicy Bypass -File scripts/setup-windows.ps1
 #
-# It checks Node.js, installs dependencies, installs dev certs (UAC prompt
-# the first time), and then runs `npm run start:debug` which boots Vite,
-# sideloads the add-in, and opens PowerPoint with it loaded.
+# It checks Node.js, installs dependencies, ensures Office Add-in dev
+# certificates are trusted, runs `npm run start:debug` (which boots Vite,
+# sideloads the add-in, and opens PowerPoint), and then keeps this window
+# alive so the dev server child process is not reaped.
 
 [CmdletBinding()]
 param()
@@ -21,8 +22,14 @@ function Write-Step($msg) {
 
 function Fail($msg) {
   Write-Host $msg -ForegroundColor Red
+  Write-Host 'Press Enter to close this window.'
+  Read-Host | Out-Null
   exit 1
 }
+
+Write-Host ''
+Write-Host 'IMPORTANT: keep this window open while using ppt-tools.' -ForegroundColor Yellow
+Write-Host 'Closing it stops the dev server and the task pane will go blank in PowerPoint.' -ForegroundColor Yellow
 
 Write-Step 'Checking Node.js'
 try {
@@ -53,7 +60,22 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Step 'Launching PowerPoint with the add-in sideloaded'
-Write-Host "When PowerPoint opens, go to the Home tab and click 'Open ppt-tools'."
-Write-Host "To stop, close this window or run 'npm run stop:debug' in another terminal."
+Write-Host "When PowerPoint opens, click 'Open ppt-tools' on the Home tab."
 Write-Host ''
 npm run start:debug
+if ($LASTEXITCODE -ne 0) { Fail 'start:debug failed.' }
+
+Write-Host ''
+Write-Host '----------------------------------------------------------------' -ForegroundColor Green
+Write-Host ' ppt-tools is running.' -ForegroundColor Green
+Write-Host ' Leave this window open while using PowerPoint.' -ForegroundColor Green
+Write-Host ' When done, close this window (the dev server will stop too).' -ForegroundColor Green
+Write-Host '----------------------------------------------------------------' -ForegroundColor Green
+
+# Block forever — closing the window is the user's signal to stop.
+try {
+  while ($true) { Start-Sleep -Seconds 60 }
+} finally {
+  # Best-effort cleanup if the user hits Ctrl+C instead of closing the window.
+  & npm run stop:debug 2>$null
+}
