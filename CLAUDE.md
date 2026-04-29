@@ -36,12 +36,12 @@ src/
 
 ## 参照図形リゾルバ・パターン
 
-`alignHeights`（`src/core/operations/alignHeights.ts`）は `ReferenceShapeResolver` をパラメータとして受け取る。実装は `src/office/` に2種類置く：
+`alignHeights`（`src/core/operations/alignHeights.ts`）は `ReferenceShapeResolver` をパラメータとして受け取る。リゾルバ自体は入力（`Shape[]` と保存済み ID 文字列）に対して純粋なので **`src/core/` に置く**。実装は 2 種類：
 
 - `LastSelectedResolver` — `shapes[shapes.length - 1]` を採用（V1）。
-- `StoredReferenceResolver` — 事前に保存した参照図形 ID を引き当てる（V2、Office.js の選択順が不安定だった場合のフォールバック）。
+- `StoredReferenceResolver` — コンストラクタで受け取った `referenceId` に一致する図形を引き当てる（V2、Office.js の選択順が不安定だった場合のフォールバック）。
 
-新しい整列系オペレーションを追加する際もこの方式を踏襲する。アルゴリズム本体は純粋に保ち、リゾルバを注入する。
+「参照図形 ID を保存／読み込みする」永続化は副作用なので `src/office/` 側で `Office.context.document.settings` 等を介して行い、得た文字列を `StoredReferenceResolver` に注入する。新しい整列系オペレーションを追加する際もこの方式を踏襲する。アルゴリズム本体は純粋に保ち、リゾルバを注入する。
 
 ## テスト規則
 

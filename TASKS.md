@@ -38,25 +38,25 @@ PowerPoint タスクペイン・アドインを記述する `manifest.xml` を�
 
 **完了条件:**
 
-- [ ] `manifest.xml` がリポジトリ直下に存在する。
-- [ ] `npm run manifest:validate` が成功する。
-- [ ] `README.md` のサイドロード節が実ラベル／実パスを使っている。
+- [x] `manifest.xml` がリポジトリ直下に存在する。
+- [x] `npm run manifest:validate` が成功する。
+- [x] `README.md` のサイドロード節が実ラベル／実パスを使っている。
 
 ### Task 2 — Vite マルチエントリ + dev-certs の HTTPS 化
 
 2 種類の HTML エントリを作成し、Vite の HTTPS サーバを dev-certs で配線する。
 
-- `src/taskpane/taskpane.html` — Office.js を CDN から読み込み、`taskpane.ts` をロードする。
+- `taskpane.html`（リポジトリ直下）— Office.js を CDN から読み込み、`src/taskpane/taskpane.ts` をロードする。Vite が `https://localhost:3000/taskpane.html` で配信できるよう、HTML はプロジェクトルートに配置している（実装段階で TASKS の当初記述から変更）。
 - `src/taskpane/taskpane.ts` — `Office.onReady` を呼び、6 ボタンのプレースホルダを描画。
-- `src/commands/commands.html` + `commands.ts` — リボンコマンド用の最小スタブ（v1 では空でも可）。
-- `vite.config.ts` — マルチエントリ入力。`office-addin-dev-certs` の証明書を読み込んで HTTPS サーバ化（証明書が無い場合は警告にとどめる）。
+- `commands.html` + `src/commands/commands.ts` — リボンコマンド用の最小スタブ。
+- `vite.config.ts` — マルチエントリ入力。`office-addin-dev-certs` の証明書があれば HTTPS、無ければ警告して HTTP にフォールバック。
 - `npm run build` で `dist/taskpane.html` と `dist/commands.html` が出力される。
 
 **完了条件:**
 
-- [ ] `npm run dev` が `https://localhost:3000` で起動し、両エントリを配信する。
-- [ ] `npm run build` が成功し、両バンドルを出力する。
-- [ ] サイドロードでプレースホルダのタスクペインまで PowerPoint で到達できる。
+- [x] `npm run dev` が `https://localhost:3000` で起動し、両エントリを配信する（dev-certs 未導入時は HTTP）。
+- [x] `npm run build` が成功し、両バンドルを出力する。
+- [ ] サイドロードでプレースホルダのタスクペインまで PowerPoint で到達できる（Windows ホスト上で要検証）。
 
 ---
 
@@ -92,9 +92,9 @@ PowerPoint タスクペイン・アドインを記述する `manifest.xml` を�
 
 **完了条件:**
 
-- [ ] 4 関数が `pack.ts` から export されている。
-- [ ] `tests/operations/pack.test.ts` が上記ケースを網羅している。
-- [ ] `npm run validate` グリーン。
+- [x] 4 関数が `pack.ts` から export されている。
+- [x] `tests/operations/pack.test.ts` が上記ケースを網羅している。
+- [x] `npm run validate` グリーン。
 
 ### Task 5 — 高さ揃え
 
@@ -118,9 +118,9 @@ PowerPoint タスクペイン・アドインを記述する `manifest.xml` を�
 
 **完了条件:**
 
-- [ ] 両リゾルバが export されている。
-- [ ] テストが全ブランチをカバー。
-- [ ] `npm run validate` グリーン。
+- [x] 両リゾルバが export されている。
+- [x] テストが全ブランチをカバー。
+- [x] `npm run validate` グリーン。
 
 ### Task 6 — 位置の入れ替え
 
@@ -134,9 +134,9 @@ PowerPoint タスクペイン・アドインを記述する `manifest.xml` を�
 
 **完了条件:**
 
-- [ ] `swapPositions` が export されている。
-- [ ] 入力数 4 ケースをすべてテスト。
-- [ ] `npm run validate` グリーン。
+- [x] `swapPositions` が export されている。
+- [x] 入力数 4 ケースをすべてテスト。
+- [x] `npm run validate` グリーン。
 
 ---
 

@@ -20,6 +20,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "validate": "npm run typecheck && npm run lint && npm run test",
+    "icons": "node scripts/generate-icons.mjs",
     "manifest:validate": "office-addin-manifest validate manifest.xml",
     "start:debug": "office-addin-debugging start manifest.xml",
     "stop:debug": "office-addin-debugging stop manifest.xml"

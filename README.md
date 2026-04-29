@@ -8,7 +8,7 @@ PowerPoint Office アドイン（VBA ではなく Office.js）。図形操作の
 
 座標計算ロジックは `src/core/` に純粋関数として実装し、Office.js に依存しません。Vitest で完全にユニットテスト可能です。Office.js に依存するアダプタコードは `src/office/` に分離されています。
 
-> **ステータス: 雛形のみ。** アドイン機能は未実装です。実装計画は [`TASKS.md`](./TASKS.md) を参照してください。
+実装の進行状況は [`TASKS.md`](./TASKS.md) を参照してください。
 
 ## 必要環境
 
@@ -43,8 +43,8 @@ npm run validate
 
 | スクリプト | 内容 |
 | --- | --- |
-| `npm run dev`             | Vite 開発サーバをポート 3000 で起動 |
-| `npm run build`           | `dist/` への本番ビルド（HTML エントリが必要 — TASKS task 2 で追加） |
+| `npm run dev`             | Vite 開発サーバを `https://localhost:3000` で起動（dev-certs インストール時のみ HTTPS。未インストール時は HTTP にフォールバック） |
+| `npm run build`           | `dist/` に `taskpane.html` / `commands.html` を含む本番ビルドを出力 |
 | `npm run typecheck`       | `tsc --noEmit` を `src/` と `tests/` に対して実行 |
 | `npm run lint`            | ESLint をワークスペース全体に実行 |
 | `npm run lint:fix`        | ESLint を `--fix` 付きで実行 |
@@ -54,8 +54,9 @@ npm run validate
 | `npm run test:watch`      | Vitest ウォッチモード |
 | `npm run test:coverage`   | Vitest（v8 カバレッジ） |
 | `npm run validate`        | `typecheck` → `lint` → `test` を順に実行 |
-| `npm run manifest:validate` | `manifest.xml` を検証（TASKS task 1 までは失敗します） |
-| `npm run start:debug`     | Office アドインのデバッグセッション開始（TASKS task 1 までは失敗します） |
+| `npm run icons`           | `manifest.xml` 用のプレースホルダ PNG（16/32/80）を `public/assets/` に再生成 |
+| `npm run manifest:validate` | `manifest.xml` を検証 |
+| `npm run start:debug`     | Office アドインのデバッグセッション開始 |
 | `npm run stop:debug`      | デバッグセッション停止 |
 
 ## プロジェクト構成
@@ -64,13 +65,22 @@ npm run validate
 .
 ├── .devcontainer/
 │   └── devcontainer.json        # Node 22 イメージ + postCreateCommand
+├── manifest.xml                 # PowerPoint アドインのマニフェスト
+├── taskpane.html                # タスクペイン HTML エントリ
+├── commands.html                # FunctionFile HTML エントリ（リボンコマンド用）
+├── public/
+│   └── assets/                  # manifest 参照のアイコン PNG（npm run icons で生成）
+├── scripts/
+│   └── generate-icons.mjs       # プレースホルダ PNG ジェネレータ
 ├── src/
 │   ├── core/                    # 純粋ロジック。Office.js 非依存。Vitest 100% テスト。
+│   │   ├── operations/          # pack / alignHeights / swap
+│   │   ├── resolvers/           # LastSelectedResolver / StoredReferenceResolver
 │   │   └── types.ts
-│   ├── office/                  # （TASKS で追加）Office.js アダプタ。PowerPoint.run / Office.context を呼ぶ唯一の層。
-│   └── taskpane/                # （TASKS で追加）タスクペイン UI（HTML + TS）
+│   ├── office/                  # Office.js アダプタ。PowerPoint.run / Office.context を呼ぶ唯一の層。
+│   ├── taskpane/                # タスクペイン UI のスクリプト
+│   └── commands/                # FunctionFile のスクリプト
 ├── tests/                       # Vitest。src/core のみ import する。
-│   └── smoke.test.ts            # プレースホルダ。TASKS task 4 で置き換え。
 ├── eslint.config.js             # flat config + typescript-eslint strict-type-checked + prettier
 ├── tsconfig.json                # TS strict（+ noUncheckedIndexedAccess、exactOptionalPropertyTypes）
 ├── vite.config.ts
@@ -83,8 +93,6 @@ npm run validate
 
 ## Windows PowerPoint への手動サイドロード
 
-> **以下の手順は雛形です。** 実体の `manifest.xml` は TASKS task 1 で作成されるため、リボンラベルや具体的なファイルパスはその時点で確定し、本 README に反映されます。下記はあくまで全体フローの骨格です。
-
 このリポジトリは Windows レジストリを変更しません。PowerPoint を自動起動しません。サイドロード自動化スクリプトも含みません。サイドロードは Windows ホスト上で**ユーザーが手動**で行います。
 
 ### 事前準備（Windows ホスト上で一度だけ）
@@ -95,7 +103,7 @@ npm run validate
    ```
    自己署名 CA を生成して Windows の証明書ストアに登録します。生成される `*.pem` / `*.crt` ファイルは `.gitignore` 済みです。
 
-2. Windows ホスト上に「共有フォルダカタログ」用のフォルダを作成します（例：`C:\OfficeAddins\ppt-tools`）。リポジトリ内の `manifest.xml` をそのフォルダにコピーします。（manifest が TASKS task 1 で追加されたあと、本 README は具体的なパスに更新されます。）
+2. Windows ホスト上に「共有フォルダカタログ」用のフォルダを作成します（例：`C:\OfficeAddins\ppt-tools`）。リポジトリ直下の `manifest.xml` をそのフォルダにコピーします。
 
 3. PowerPoint で、その共有フォルダを「信頼できるアドインカタログ」として登録：
    - **ファイル → オプション → トラスト センター → トラスト センターの設定 → 信頼できるアドイン カタログ**
@@ -108,11 +116,11 @@ npm run validate
    ```bash
    npm run dev
    ```
-   開発サーバは `https://localhost:3000` でタスクペインを配信します（dev-certs を `vite.config.ts` に組み込み済みになると HTTPS で動作。TASKS task 2）。
+   開発サーバは `https://localhost:3000` でタスクペイン（`/taskpane.html`）と FunctionFile（`/commands.html`）を配信します。dev-certs インストール済みなら HTTPS、未インストール時は HTTP（PowerPoint からは読み込めないので警告ログが出ます）。
 
 2. PowerPoint 上で：
    - **挿入 → アドインの取得 → 共有フォルダー → ppt-tools → 追加**
-   - リボンにアドインのボタンが現れます（ラベルは TASKS task 1 で確定）。
+   - リボンの **ホーム** タブに **ppt-tools** グループが追加され、**Open ppt-tools** ボタンが現れます。
    - クリックでタスクペインが開きます。
 
 ### 開発ループ
@@ -131,4 +139,4 @@ npm run validate
 
 ## ライセンス
 
-非公開。配布ライセンスは未設定です。
+公開（AppSource やストア配布）を視野に開発中です。配布前に正式なライセンス文を `LICENSE` ファイルとして同梱します。
