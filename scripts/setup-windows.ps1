@@ -71,6 +71,16 @@ try {
     Stop-OnError $LASTEXITCODE 'Dev cert install failed. Try running this script as Administrator.'
   }
 
+  Write-Step 'Releasing port 3000 if a previous run left it occupied'
+  $stale = Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue |
+    Select-Object -ExpandProperty OwningProcess -Unique
+  foreach ($pid in $stale) {
+    if ($pid -gt 0) {
+      Write-Host "  killing stale process on port 3000 (PID $pid)"
+      Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
+    }
+  }
+
   Write-Step 'Starting the Vite dev server in a new window'
   Write-Host 'A separate "ppt-tools dev server" window will open. Keep it open too.'
   $devCmd = "title ppt-tools dev server (Vite) && cd /d `"$projectDir`" && npm run dev"
