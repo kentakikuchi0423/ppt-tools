@@ -152,8 +152,8 @@ PowerPoint タスクペイン・アドインを記述する `manifest.xml` を�
 
 **完了条件:**
 
-- [ ] PowerPoint 上での手動スモーク: 3 個の図形を選択すると、ジオメトリが正しい 3 件の `Shape` レコードが返る。
-- [ ] `src/core/` からの import は型のみ。
+- [ ] PowerPoint 上での手動スモーク: 3 個の図形を選択すると、ジオメトリが正しい 3 件の `Shape` レコードが返る（Windows ホスト上で要検証）。
+- [x] `src/core/` からの import は型のみ。
 
 ### Task 8 — 選択への書き戻し
 
@@ -164,7 +164,7 @@ PowerPoint タスクペイン・アドインを記述する `manifest.xml` を�
 
 **完了条件:**
 
-- [ ] 手動スモーク: PowerPoint 上で変更が反映され、Ctrl+Z 一回ですべて取り消せる。
+- [ ] 手動スモーク: PowerPoint 上で変更が反映され、Ctrl+Z 一回ですべて取り消せる（Windows ホスト上で要検証）。
 
 ---
 
@@ -181,8 +181,8 @@ PowerPoint タスクペイン・アドインを記述する `manifest.xml` を�
 
 **完了条件:**
 
-- [ ] 6 ボタンすべてが PowerPoint 上で動作する。
-- [ ] 不正な選択数の場合にエラーメッセージが表示される。
+- [ ] 6 ボタンすべてが PowerPoint 上で動作する（Windows ホスト上で要検証）。
+- [x] 不正な選択数の場合にエラーメッセージが表示される（コア層が `OperationResult.reason` を返し、UI が表示する経路を実装済み）。
 
 ### Task 10 — 手動サイドロード検証
 
@@ -201,5 +201,5 @@ PowerPoint タスクペイン・アドインを記述する `manifest.xml` を�
 
 **完了条件:**
 
-- [ ] Q1 〜 Q4 がクローズしている。
-- [ ] 選択数に応じたボタンの活性／非活性が機能している。
+- [x] Q1 〜 Q4 がクローズしている（`REQUIREMENTS.md` 末尾「確定済みの設計判断」節）。
+- [x] 選択数に応じたボタンの活性／非活性を実装（`DocumentSelectionChanged` 購読と `window` の focus イベントで再評価。Windows ホスト上での実機確認は Task 10 の範囲）。
