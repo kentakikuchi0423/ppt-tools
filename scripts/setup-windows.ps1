@@ -3,10 +3,13 @@
 # Run via the start.cmd wrapper at the repo root (double-click it), or directly:
 #   pwsh -ExecutionPolicy Bypass -File scripts/setup-windows.ps1
 #
-# It checks Node.js, installs dependencies, ensures Office Add-in dev
-# certificates are trusted, runs `npm run start:debug` (which boots Vite,
-# sideloads the add-in, and opens PowerPoint), and then keeps this window
-# alive so the dev server child process is not reaped.
+# Flow:
+#   1. Sanity-check Node.js, install dependencies, ensure Office dev certs.
+#   2. Start Vite in a SEPARATE cmd window so its output is visible and
+#      its lifecycle is independent of this script.
+#   3. Wait for the dev server to actually accept connections on port 3000.
+#   4. Sideload the manifest and launch PowerPoint via office-addin-debugging.
+#   5. Block forever — closing this window stops the debug session.
 
 [CmdletBinding()]
 param()
@@ -26,6 +29,8 @@ function Stop-OnError($code, $msg) {
   $null = Read-Host
   exit $code
 }
+
+$devProc = $null
 
 try {
   Write-Host ''
@@ -66,26 +71,44 @@ try {
     Stop-OnError $LASTEXITCODE 'Dev cert install failed. Try running this script as Administrator.'
   }
 
-  Write-Step 'Launching PowerPoint with the add-in sideloaded'
-  Write-Host "When PowerPoint opens, click 'Open ppt-tools' on the Home tab."
-  Write-Host ''
+  Write-Step 'Starting the Vite dev server in a new window'
+  Write-Host 'A separate "ppt-tools dev server" window will open. Keep it open too.'
+  $devCmd = "title ppt-tools dev server (Vite) && cd /d `"$projectDir`" && npm run dev"
+  $devProc = Start-Process -PassThru -FilePath 'cmd.exe' -ArgumentList @('/k', $devCmd)
+
+  Write-Step 'Waiting for the dev server to accept connections on port 3000'
+  $ready = $false
+  for ($i = 1; $i -le 60; $i++) {
+    Start-Sleep -Seconds 1
+    $tcp = Test-NetConnection -ComputerName 'localhost' -Port 3000 `
+      -WarningAction SilentlyContinue -InformationLevel Quiet
+    if ($tcp) { $ready = $true; break }
+    if ($i % 10 -eq 0) { Write-Host "  still waiting ($i s)..." }
+  }
+  if (-not $ready) {
+    Stop-OnError 1 'Dev server did not start within 60 seconds. Check the "ppt-tools dev server" window for errors.'
+  }
+  Write-Host 'Dev server is listening on port 3000.'
+
+  Write-Step 'Sideloading the add-in and launching PowerPoint'
   & npm run start:debug
-  $debugExit = $LASTEXITCODE
-  if ($debugExit -ne 0) {
-    Stop-OnError $debugExit "start:debug exited with code $debugExit."
+  if ($LASTEXITCODE -ne 0) {
+    Stop-OnError $LASTEXITCODE "start:debug exited with code $LASTEXITCODE."
   }
 
   Write-Host ''
   Write-Host '----------------------------------------------------------------' -ForegroundColor Green
   Write-Host ' ppt-tools is running.' -ForegroundColor Green
-  Write-Host ' Leave this window open while using PowerPoint.' -ForegroundColor Green
-  Write-Host ' When done, close this window (the dev server will stop too).' -ForegroundColor Green
+  Write-Host ' Keep this window AND the "ppt-tools dev server" window open.' -ForegroundColor Green
+  Write-Host ' When done, close this window — both will stop together.' -ForegroundColor Green
   Write-Host '----------------------------------------------------------------' -ForegroundColor Green
 
-  # Block forever — closing the window is the user's signal to stop.
   try {
     while ($true) { Start-Sleep -Seconds 60 }
   } finally {
+    if ($devProc -and -not $devProc.HasExited) {
+      Stop-Process -Id $devProc.Id -Force -ErrorAction SilentlyContinue
+    }
     & npm run stop:debug 2>$null
   }
 } catch {
@@ -93,6 +116,9 @@ try {
   Write-Host "Unexpected error: $_" -ForegroundColor Red
   if ($_.ScriptStackTrace) {
     Write-Host $_.ScriptStackTrace -ForegroundColor DarkGray
+  }
+  if ($devProc -and -not $devProc.HasExited) {
+    Stop-Process -Id $devProc.Id -Force -ErrorAction SilentlyContinue
   }
   Stop-OnError 1 'Setup failed. See the message above.'
 }
