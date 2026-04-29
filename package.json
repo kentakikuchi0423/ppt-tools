@@ -5,7 +5,7 @@
   "description": "PowerPoint Office Add-in for shape manipulation (pack, align heights, swap positions).",
   "type": "module",
   "engines": {
-    "node": ">=22 <23"
+    "node": ">=22"
   },
   "scripts": {
     "dev": "vite",
