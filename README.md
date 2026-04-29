@@ -55,10 +55,12 @@ npx office-addin-dev-certs install   # UAC ダイアログで「はい」
 
 ```powershell
 # 通常の PowerShell（毎回）
-npm run dev
+npm run start:debug
 ```
 
-`npm run dev` が `https://localhost:3000` を起動したら、別の Windows ターミナルから手動でサイドロードします（次節「Windows PowerPoint への手動サイドロード」を参照）。
+`npm run start:debug` は dev サーバ（`https://localhost:3000`）の起動 → アドインのサイドロード → PowerPoint の起動までを一括で行います。PowerPoint が立ち上がったらリボンの **ホーム** タブにある **ppt-tools** グループの **Open ppt-tools** ボタンをクリックすればタスクペインが開きます。
+
+終了するときは `npm run stop:debug`。
 
 ## npm スクリプト
 
