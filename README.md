@@ -41,23 +41,23 @@ npm run validate
 
 ## npm スクリプト
 
-| スクリプト | 内容 |
-| --- | --- |
-| `npm run dev`             | Vite 開発サーバを `https://localhost:3000` で起動（dev-certs インストール時のみ HTTPS。未インストール時は HTTP にフォールバック） |
-| `npm run build`           | `dist/` に `taskpane.html` / `commands.html` を含む本番ビルドを出力 |
-| `npm run typecheck`       | `tsc --noEmit` を `src/` と `tests/` に対して実行 |
-| `npm run lint`            | ESLint をワークスペース全体に実行 |
-| `npm run lint:fix`        | ESLint を `--fix` 付きで実行 |
-| `npm run format`          | Prettier `--write` をワークスペース全体に実行 |
-| `npm run format:check`    | Prettier `--check`（CI 向け） |
-| `npm run test`            | Vitest シングル実行 |
-| `npm run test:watch`      | Vitest ウォッチモード |
-| `npm run test:coverage`   | Vitest（v8 カバレッジ） |
-| `npm run validate`        | `typecheck` → `lint` → `test` を順に実行 |
-| `npm run icons`           | `manifest.xml` 用のプレースホルダ PNG（16/32/80）を `public/assets/` に再生成 |
-| `npm run manifest:validate` | `manifest.xml` を検証 |
-| `npm run start:debug`     | Office アドインのデバッグセッション開始 |
-| `npm run stop:debug`      | デバッグセッション停止 |
+| スクリプト                  | 内容                                                                                                                              |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`               | Vite 開発サーバを `https://localhost:3000` で起動（dev-certs インストール時のみ HTTPS。未インストール時は HTTP にフォールバック） |
+| `npm run build`             | `dist/` に `taskpane.html` / `commands.html` を含む本番ビルドを出力                                                               |
+| `npm run typecheck`         | `tsc --noEmit` を `src/` と `tests/` に対して実行                                                                                 |
+| `npm run lint`              | ESLint をワークスペース全体に実行                                                                                                 |
+| `npm run lint:fix`          | ESLint を `--fix` 付きで実行                                                                                                      |
+| `npm run format`            | Prettier `--write` をワークスペース全体に実行                                                                                     |
+| `npm run format:check`      | Prettier `--check`（CI 向け）                                                                                                     |
+| `npm run test`              | Vitest シングル実行                                                                                                               |
+| `npm run test:watch`        | Vitest ウォッチモード                                                                                                             |
+| `npm run test:coverage`     | Vitest（v8 カバレッジ）                                                                                                           |
+| `npm run validate`          | `typecheck` → `lint` → `test` を順に実行                                                                                          |
+| `npm run icons`             | `manifest.xml` 用のプレースホルダ PNG（16/32/80）を `public/assets/` に再生成                                                     |
+| `npm run manifest:validate` | `manifest.xml` を検証                                                                                                             |
+| `npm run start:debug`       | Office アドインのデバッグセッション開始                                                                                           |
+| `npm run stop:debug`        | デバッグセッション停止                                                                                                            |
 
 ## プロジェクト構成
 
@@ -98,9 +98,11 @@ npm run validate
 ### 事前準備（Windows ホスト上で一度だけ）
 
 1. 開発用証明書をインストールし、PowerPoint が `https://localhost:3000` を信頼できるようにします：
+
    ```bash
    npx office-addin-dev-certs install
    ```
+
    自己署名 CA を生成して Windows の証明書ストアに登録します。生成される `*.pem` / `*.crt` ファイルは `.gitignore` 済みです。
 
 2. Windows ホスト上に「共有フォルダカタログ」用のフォルダを作成します（例：`C:\OfficeAddins\ppt-tools`）。リポジトリ直下の `manifest.xml` をそのフォルダにコピーします。
@@ -113,9 +115,11 @@ npm run validate
 ### アドインの起動
 
 1. devcontainer 内（あるいは Node 22 のホスト）で：
+
    ```bash
    npm run dev
    ```
+
    開発サーバは `https://localhost:3000` でタスクペイン（`/taskpane.html`）と FunctionFile（`/commands.html`）を配信します。dev-certs インストール済みなら HTTPS、未インストール時は HTTP（PowerPoint からは読み込めないので警告ログが出ます）。
 
 2. PowerPoint 上で：

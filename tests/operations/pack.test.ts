@@ -33,7 +33,11 @@ describe('packDown', () => {
   });
 
   it('sorts unsorted input by top before packing', () => {
-    const out = packDown([shape('c', 0, 200, 10, 20), shape('a', 0, 0, 10, 50), shape('b', 0, 100, 10, 30)]);
+    const out = packDown([
+      shape('c', 0, 200, 10, 20),
+      shape('a', 0, 0, 10, 50),
+      shape('b', 0, 100, 10, 30),
+    ]);
     expect(out.map((s) => s.id)).toEqual(['a', 'b', 'c']);
     expect(out[0]?.top).toBe(0);
     expect(out[1]?.top).toBe(50);
@@ -84,7 +88,11 @@ describe('packUp', () => {
   });
 
   it('handles unsorted input', () => {
-    const out = packUp([shape('b', 0, 100, 10, 30), shape('c', 0, 200, 10, 20), shape('a', 0, 0, 10, 50)]);
+    const out = packUp([
+      shape('b', 0, 100, 10, 30),
+      shape('c', 0, 200, 10, 20),
+      shape('a', 0, 0, 10, 50),
+    ]);
     expect(out.map((s) => s.id)).toEqual(['a', 'b', 'c']);
     expect(out[2]?.top).toBe(200);
     expect(out[1]?.top).toBe(170);
@@ -131,7 +139,11 @@ describe('packLeft', () => {
   });
 
   it('sorts unsorted input by left', () => {
-    const out = packLeft([shape('c', 200, 0, 20, 10), shape('a', 0, 0, 50, 10), shape('b', 100, 0, 30, 10)]);
+    const out = packLeft([
+      shape('c', 200, 0, 20, 10),
+      shape('a', 0, 0, 50, 10),
+      shape('b', 100, 0, 30, 10),
+    ]);
     expect(out.map((s) => s.id)).toEqual(['a', 'b', 'c']);
   });
 
@@ -171,7 +183,11 @@ describe('packRight', () => {
   });
 
   it('handles unsorted input', () => {
-    const out = packRight([shape('b', 100, 0, 30, 10), shape('c', 200, 0, 20, 10), shape('a', 0, 0, 50, 10)]);
+    const out = packRight([
+      shape('b', 100, 0, 30, 10),
+      shape('c', 200, 0, 20, 10),
+      shape('a', 0, 0, 50, 10),
+    ]);
     expect(out.map((s) => s.id)).toEqual(['a', 'b', 'c']);
   });
 

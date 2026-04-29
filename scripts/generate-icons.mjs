@@ -38,8 +38,7 @@ function buildPixels(size) {
     for (let x = 0; x < size; x++) {
       const gx = Math.floor((x - offset) / scale);
       const gy = Math.floor((y - offset) / scale);
-      const inGlyph =
-        gx >= 0 && gx < 8 && gy >= 0 && gy < 8 && GLYPH[gy] && GLYPH[gy][gx] === 1;
+      const inGlyph = gx >= 0 && gx < 8 && gy >= 0 && gy < 8 && GLYPH[gy] && GLYPH[gy][gx] === 1;
       const [r, g, b] = inGlyph ? FG : BG;
       const i = (y * size + x) * 3;
       pixels[i] = r;

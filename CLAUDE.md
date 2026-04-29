@@ -55,19 +55,19 @@ src/
 
 ## よく使うコマンド
 
-| コマンド | 用途 |
-| --- | --- |
-| `npm run validate` | `typecheck` → `lint` → `test`。タスク完了宣言の前に必ずグリーンにする。 |
-| `npm run typecheck` | `tsc --noEmit` を `src/` と `tests/` に対して実行（設定は `tsconfig.json`）。 |
-| `npm run lint` / `npm run lint:fix` | ESLint flat config（`eslint.config.js`）。 |
-| `npm run test` / `npm run test:watch` | Vitest。テストファイルは `tests/**/*.test.ts`。 |
-| `npm run test:coverage` | v8 カバレッジ。`src/core/**` のみ計測（`vitest.config.ts`）。 |
-| `npx vitest run tests/operations/pack.test.ts` | 単一テストファイルを実行。 |
-| `npx vitest run -t "pack down sorts"` | テスト名パターンで絞り込み実行。 |
-| `npm run dev` | Vite 開発サーバを `https://localhost:3000` で起動（dev-certs 配線後に HTTPS 化）。 |
-| `npm run build` | 本番ビルドを `dist/` へ出力。HTML エントリ（TASKS task 2）が無いうちは失敗する。 |
-| `npm run manifest:validate` | `manifest.xml` の検証。TASKS task 1 で manifest を作るまでは失敗する。 |
-| `npm run start:debug` / `npm run stop:debug` | `office-addin-debugging` セッション。前提は同上。 |
+| コマンド                                       | 用途                                                                               |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `npm run validate`                             | `typecheck` → `lint` → `test`。タスク完了宣言の前に必ずグリーンにする。            |
+| `npm run typecheck`                            | `tsc --noEmit` を `src/` と `tests/` に対して実行（設定は `tsconfig.json`）。      |
+| `npm run lint` / `npm run lint:fix`            | ESLint flat config（`eslint.config.js`）。                                         |
+| `npm run test` / `npm run test:watch`          | Vitest。テストファイルは `tests/**/*.test.ts`。                                    |
+| `npm run test:coverage`                        | v8 カバレッジ。`src/core/**` のみ計測（`vitest.config.ts`）。                      |
+| `npx vitest run tests/operations/pack.test.ts` | 単一テストファイルを実行。                                                         |
+| `npx vitest run -t "pack down sorts"`          | テスト名パターンで絞り込み実行。                                                   |
+| `npm run dev`                                  | Vite 開発サーバを `https://localhost:3000` で起動（dev-certs 配線後に HTTPS 化）。 |
+| `npm run build`                                | 本番ビルドを `dist/` へ出力。HTML エントリ（TASKS task 2）が無いうちは失敗する。   |
+| `npm run manifest:validate`                    | `manifest.xml` の検証。TASKS task 1 で manifest を作るまでは失敗する。             |
+| `npm run start:debug` / `npm run stop:debug`   | `office-addin-debugging` セッション。前提は同上。                                  |
 
 Node 22 必須（`engines: ">=22 <23"`）。実行環境は devcontainer（`.devcontainer/devcontainer.json`）の使用を推奨。
 

@@ -96,12 +96,9 @@ void Office.onReady((info) => {
   // selection changes within a slide aren't always covered, so we also
   // refresh on window focus as a fallback when the user clicks back into the
   // pane after selecting different shapes.
-  Office.context.document.addHandlerAsync(
-    Office.EventType.DocumentSelectionChanged,
-    () => {
-      void refreshButtonStates();
-    },
-  );
+  Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, () => {
+    void refreshButtonStates();
+  });
   window.addEventListener('focus', () => {
     void refreshButtonStates();
   });
