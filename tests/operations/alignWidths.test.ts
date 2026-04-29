@@ -29,10 +29,7 @@ describe('alignWidths', () => {
   });
 
   it('aligns all shapes to the last-selected reference width', () => {
-    const r = alignWidths(
-      [shape('a', 50), shape('b', 60), shape('c', 70)],
-      LastSelectedResolver,
-    );
+    const r = alignWidths([shape('a', 50), shape('b', 60), shape('c', 70)], LastSelectedResolver);
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.shapes.map((s) => s.width)).toEqual([70, 70, 70]);
@@ -59,10 +56,7 @@ describe('alignWidths', () => {
 
   it('uses StoredReferenceResolver to find the reference by id', () => {
     const resolver = new StoredReferenceResolver('b');
-    const r = alignWidths(
-      [shape('a', 50), shape('b', 60), shape('c', 70)],
-      resolver,
-    );
+    const r = alignWidths([shape('a', 50), shape('b', 60), shape('c', 70)], resolver);
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.shapes.every((s) => s.width === 60)).toBe(true);

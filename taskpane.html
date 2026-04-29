@@ -15,22 +15,43 @@
       <section aria-label="詰める">
         <h2>詰める</h2>
         <div class="row">
-          <button id="pack-up" type="button">上に詰める</button>
-          <button id="pack-down" type="button">下に詰める</button>
-          <button id="pack-left" type="button">左に詰める</button>
-          <button id="pack-right" type="button">右に詰める</button>
+          <button id="pack-up" type="button" data-icon="pack-up">
+            <span class="icon" aria-hidden="true"></span>
+            <span class="label">上に詰める</span>
+          </button>
+          <button id="pack-down" type="button" data-icon="pack-down">
+            <span class="icon" aria-hidden="true"></span>
+            <span class="label">下に詰める</span>
+          </button>
+          <button id="pack-left" type="button" data-icon="pack-left">
+            <span class="icon" aria-hidden="true"></span>
+            <span class="label">左に詰める</span>
+          </button>
+          <button id="pack-right" type="button" data-icon="pack-right">
+            <span class="icon" aria-hidden="true"></span>
+            <span class="label">右に詰める</span>
+          </button>
         </div>
       </section>
       <section aria-label="揃える">
         <h2>揃える</h2>
         <div class="row">
-          <button id="align-heights" type="button">高さを揃える</button>
-          <button id="align-widths" type="button">幅を揃える</button>
+          <button id="align-heights" type="button" data-icon="align-heights">
+            <span class="icon" aria-hidden="true"></span>
+            <span class="label">高さを揃える</span>
+          </button>
+          <button id="align-widths" type="button" data-icon="align-widths">
+            <span class="icon" aria-hidden="true"></span>
+            <span class="label">幅を揃える</span>
+          </button>
         </div>
       </section>
       <section aria-label="入れ替え">
         <h2>入れ替え</h2>
-        <button id="swap-positions" type="button">位置を入れ替える</button>
+        <button id="swap-positions" type="button" data-icon="swap" class="full">
+          <span class="icon" aria-hidden="true"></span>
+          <span class="label">位置を入れ替える</span>
+        </button>
       </section>
       <section aria-label="ステータス" id="status-section">
         <p id="status" role="status" aria-live="polite"></p>
