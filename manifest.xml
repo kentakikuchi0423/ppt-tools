@@ -7,7 +7,7 @@
     xsi:type="TaskPaneApp">
 
   <Id>c3f24a1e-e4a8-4a54-8d26-ff2db8ed9e0e</Id>
-  <Version>1.0.7.0</Version>
+  <Version>2.0.3.0</Version>
   <ProviderName>ppt-tools</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="ppt-tools" />
@@ -44,16 +44,6 @@
 
           <ExtensionPoint xsi:type="PrimaryCommandSurface">
             <OfficeTab id="TabHome">
-              <!--
-                PowerPoint sideloaded TaskPaneApps render only the first
-                OfficeTab Group and cap each Group at six controls.
-                Layout (6 controls): four pack buttons stay top-level,
-                the two align operations are grouped into a single
-                "高さ/幅を揃える" Menu, and swap-positions stays
-                top-level. Menu items are individually pinnable to the
-                QAT, so every operation can be promoted to a one-click
-                shortcut.
-              -->
               <Group id="PptTools.MainGroup">
                 <Label resid="PptTools.MainGroup.Label" />
                 <Icon>
@@ -228,11 +218,11 @@
       <bt:ShortStrings>
         <bt:String id="GetStarted.Title" DefaultValue="ppt-tools is ready." />
         <bt:String id="PptTools.MainGroup.Label" DefaultValue="ppt-tools" />
+        <bt:String id="PptTools.AlignMenu.Label" DefaultValue="高さ/幅を揃える" />
         <bt:String id="PptTools.PackDown.Label" DefaultValue="下に詰める" />
         <bt:String id="PptTools.PackUp.Label" DefaultValue="上に詰める" />
         <bt:String id="PptTools.PackLeft.Label" DefaultValue="左に詰める" />
         <bt:String id="PptTools.PackRight.Label" DefaultValue="右に詰める" />
-        <bt:String id="PptTools.AlignMenu.Label" DefaultValue="高さ/幅を揃える" />
         <bt:String id="PptTools.AlignHeights.Label" DefaultValue="高さを揃える" />
         <bt:String id="PptTools.AlignWidths.Label" DefaultValue="幅を揃える" />
         <bt:String id="PptTools.SwapPositions.Label" DefaultValue="位置を入れ替える" />
@@ -249,5 +239,178 @@
         <bt:String id="PptTools.SwapPositions.Tooltip" DefaultValue="選択中のちょうど 2 つの図形の位置（left/top）を入れ替えます。サイズは保持。" />
       </bt:LongStrings>
     </Resources>
+
+    <!--
+      VersionOverridesV1_1 supersedes the V1_0 block above on hosts that
+      support it (PowerPoint Microsoft 365 builds since 2018-2019). The
+      V1_1 layer is what gives us shared runtime, which keeps a single
+      JS context alive for the lifetime of the document — that lets us
+      register a continuous selection-changed listener and keep
+      Office.ribbon.requestUpdate in sync with the current selection
+      regardless of whether the task pane is open. It also lets us spread
+      the seven operations across three labelled groups so every command
+      stays a one-click QAT-pinnable button.
+    -->
+    <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
+      <Requirements>
+        <bt:Sets DefaultMinVersion="1.1">
+          <bt:Set Name="SharedRuntime" MinVersion="1.1" />
+        </bt:Sets>
+      </Requirements>
+      <Hosts>
+        <Host xsi:type="Presentation">
+          <Runtimes>
+            <Runtime resid="Taskpane.Url" lifetime="long" />
+          </Runtimes>
+          <DesktopFormFactor>
+            <GetStarted>
+              <Title resid="GetStarted.Title" />
+              <Description resid="GetStarted.Description" />
+              <LearnMoreUrl resid="GetStarted.LearnMoreUrl" />
+            </GetStarted>
+
+            <FunctionFile resid="Taskpane.Url" />
+
+            <ExtensionPoint xsi:type="PrimaryCommandSurface">
+              <OfficeTab id="TabHome">
+                <Group id="PptTools.MainGroup">
+                  <Label resid="PptTools.MainGroup.Label" />
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16" />
+                    <bt:Image size="32" resid="Icon.32x32" />
+                    <bt:Image size="80" resid="Icon.80x80" />
+                  </Icon>
+
+                  <Control xsi:type="Button" id="PptTools.PackDown">
+                    <Label resid="PptTools.PackDown.Label" />
+                    <Supertip>
+                      <Title resid="PptTools.PackDown.Label" />
+                      <Description resid="PptTools.PackDown.Tooltip" />
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.PackDown.16x16" />
+                      <bt:Image size="32" resid="Icon.PackDown.32x32" />
+                      <bt:Image size="80" resid="Icon.PackDown.80x80" />
+                    </Icon>
+                    <Action xsi:type="ExecuteFunction">
+                      <FunctionName>packDown</FunctionName>
+                    </Action>
+                  </Control>
+
+                  <Control xsi:type="Button" id="PptTools.PackUp">
+                    <Label resid="PptTools.PackUp.Label" />
+                    <Supertip>
+                      <Title resid="PptTools.PackUp.Label" />
+                      <Description resid="PptTools.PackUp.Tooltip" />
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.PackUp.16x16" />
+                      <bt:Image size="32" resid="Icon.PackUp.32x32" />
+                      <bt:Image size="80" resid="Icon.PackUp.80x80" />
+                    </Icon>
+                    <Action xsi:type="ExecuteFunction">
+                      <FunctionName>packUp</FunctionName>
+                    </Action>
+                  </Control>
+
+                  <Control xsi:type="Button" id="PptTools.PackLeft">
+                    <Label resid="PptTools.PackLeft.Label" />
+                    <Supertip>
+                      <Title resid="PptTools.PackLeft.Label" />
+                      <Description resid="PptTools.PackLeft.Tooltip" />
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.PackLeft.16x16" />
+                      <bt:Image size="32" resid="Icon.PackLeft.32x32" />
+                      <bt:Image size="80" resid="Icon.PackLeft.80x80" />
+                    </Icon>
+                    <Action xsi:type="ExecuteFunction">
+                      <FunctionName>packLeft</FunctionName>
+                    </Action>
+                  </Control>
+
+                  <Control xsi:type="Button" id="PptTools.PackRight">
+                    <Label resid="PptTools.PackRight.Label" />
+                    <Supertip>
+                      <Title resid="PptTools.PackRight.Label" />
+                      <Description resid="PptTools.PackRight.Tooltip" />
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.PackRight.16x16" />
+                      <bt:Image size="32" resid="Icon.PackRight.32x32" />
+                      <bt:Image size="80" resid="Icon.PackRight.80x80" />
+                    </Icon>
+                    <Action xsi:type="ExecuteFunction">
+                      <FunctionName>packRight</FunctionName>
+                    </Action>
+                  </Control>
+
+                  <Control xsi:type="Menu" id="PptTools.AlignMenu">
+                    <Label resid="PptTools.AlignMenu.Label" />
+                    <Supertip>
+                      <Title resid="PptTools.AlignMenu.Label" />
+                      <Description resid="PptTools.AlignMenu.Tooltip" />
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.AlignHeights.16x16" />
+                      <bt:Image size="32" resid="Icon.AlignHeights.32x32" />
+                      <bt:Image size="80" resid="Icon.AlignHeights.80x80" />
+                    </Icon>
+                    <Items>
+                      <Item id="PptTools.AlignMenu.AlignHeights">
+                        <Label resid="PptTools.AlignHeights.Label" />
+                        <Supertip>
+                          <Title resid="PptTools.AlignHeights.Label" />
+                          <Description resid="PptTools.AlignHeights.Tooltip" />
+                        </Supertip>
+                        <Icon>
+                          <bt:Image size="16" resid="Icon.AlignHeights.16x16" />
+                          <bt:Image size="32" resid="Icon.AlignHeights.32x32" />
+                          <bt:Image size="80" resid="Icon.AlignHeights.80x80" />
+                        </Icon>
+                        <Action xsi:type="ExecuteFunction">
+                          <FunctionName>alignHeights</FunctionName>
+                        </Action>
+                      </Item>
+                      <Item id="PptTools.AlignMenu.AlignWidths">
+                        <Label resid="PptTools.AlignWidths.Label" />
+                        <Supertip>
+                          <Title resid="PptTools.AlignWidths.Label" />
+                          <Description resid="PptTools.AlignWidths.Tooltip" />
+                        </Supertip>
+                        <Icon>
+                          <bt:Image size="16" resid="Icon.AlignWidths.16x16" />
+                          <bt:Image size="32" resid="Icon.AlignWidths.32x32" />
+                          <bt:Image size="80" resid="Icon.AlignWidths.80x80" />
+                        </Icon>
+                        <Action xsi:type="ExecuteFunction">
+                          <FunctionName>alignWidths</FunctionName>
+                        </Action>
+                      </Item>
+                    </Items>
+                  </Control>
+
+                  <Control xsi:type="Button" id="PptTools.SwapPositions">
+                    <Label resid="PptTools.SwapPositions.Label" />
+                    <Supertip>
+                      <Title resid="PptTools.SwapPositions.Label" />
+                      <Description resid="PptTools.SwapPositions.Tooltip" />
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.Swap.16x16" />
+                      <bt:Image size="32" resid="Icon.Swap.32x32" />
+                      <bt:Image size="80" resid="Icon.Swap.80x80" />
+                    </Icon>
+                    <Action xsi:type="ExecuteFunction">
+                      <FunctionName>swapPositions</FunctionName>
+                    </Action>
+                  </Control>
+                </Group>
+              </OfficeTab>
+            </ExtensionPoint>
+          </DesktopFormFactor>
+        </Host>
+      </Hosts>
+    </VersionOverrides>
   </VersionOverrides>
 </OfficeApp>

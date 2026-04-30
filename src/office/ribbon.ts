@@ -1,6 +1,11 @@
 // Updates the enabled/disabled state of the ppt-tools ribbon controls in
 // response to selection changes, so the user can tell at a glance which
 // operations make sense for the current selection.
+//
+// IDs are shared between the V1.0 fallback and the V1.1 shared-runtime
+// blocks of manifest.xml. Whichever block the host accepts, the same ID
+// is what's actually rendered, so a single requestUpdate covers both
+// paths.
 
 const TAB_ID = 'TabHome';
 const GROUP_ID = 'PptTools.MainGroup';
@@ -14,29 +19,7 @@ const CONTROL_IDS = [
   'PptTools.SwapPositions',
 ] as const;
 
-export type RibbonStatus =
-  | { kind: 'pending' }
-  | { kind: 'unsupported' }
-  | { kind: 'ok' }
-  | { kind: 'error'; message: string };
-
-let lastStatus: RibbonStatus = { kind: 'pending' };
-const listeners = new Set<(status: RibbonStatus) => void>();
-
-function setStatus(next: RibbonStatus): void {
-  lastStatus = next;
-  for (const listener of listeners) listener(next);
-}
-
-export function getRibbonStatus(): RibbonStatus {
-  return lastStatus;
-}
-
-export function onRibbonStatusChange(listener: (status: RibbonStatus) => void): () => void {
-  listeners.add(listener);
-  listener(lastStatus);
-  return () => listeners.delete(listener);
-}
+let warnedNoRibbonApi = false;
 
 function ribbonApiSupported(): boolean {
   try {
@@ -47,13 +30,15 @@ function ribbonApiSupported(): boolean {
 }
 
 export async function setRibbonEnabled(enabled: boolean): Promise<void> {
-  if (typeof Office === 'undefined') {
-    setStatus({ kind: 'error', message: 'Office not available' });
-    return;
-  }
+  if (typeof Office === 'undefined') return;
 
   if (!ribbonApiSupported()) {
-    setStatus({ kind: 'unsupported' });
+    if (!warnedNoRibbonApi) {
+      warnedNoRibbonApi = true;
+      console.warn(
+        '[ppt-tools] RibbonApi 1.1 not supported in this Office host — ribbon controls will not grey out.',
+      );
+    }
     return;
   }
 
@@ -71,10 +56,7 @@ export async function setRibbonEnabled(enabled: boolean): Promise<void> {
         },
       ],
     });
-    setStatus({ kind: 'ok' });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
     console.error('[ppt-tools] Office.ribbon.requestUpdate failed:', err);
-    setStatus({ kind: 'error', message });
   }
 }

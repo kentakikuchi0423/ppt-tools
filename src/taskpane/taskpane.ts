@@ -4,6 +4,7 @@ import { packDown, packLeft, packRight, packUp } from '../core/operations/pack.j
 import { swapPositions } from '../core/operations/swap.js';
 import { LastSelectedResolver } from '../core/resolvers/lastSelected.js';
 import type { OperationResult, Shape } from '../core/types.js';
+import { registerRibbonActions } from '../office/actions.js';
 import { setRibbonEnabled } from '../office/ribbon.js';
 import { applyShapes, getSelectedShapes } from '../office/selection.js';
 import './taskpane.css';
@@ -28,9 +29,6 @@ const operations: Record<ButtonId, Op> = {
   'swap-positions': swapPositions,
 };
 
-// 1 個でも選択されていれば各ボタンは押せるようにし、押下時に各オペレーションが
-// 「なぜ動かないか」のメッセージを返すようにする。0 個のときだけ選択そのものが
-// 無いので全部無効化する。
 const buttonIds = Object.keys(operations) as ButtonId[];
 
 function applyButtonStates(selectionCount: number): void {
@@ -79,18 +77,32 @@ async function runOperation(op: Op): Promise<void> {
 }
 
 void Office.onReady((info) => {
+  // Shared runtime entry: this script runs once when the document opens
+  // (V1.1 hosts) or the first time the task pane shows / a ribbon button
+  // is clicked. Register the ribbon action handlers here so they're
+  // available before any ribbon dispatch.
+  registerRibbonActions();
+
   if (info.host !== Office.HostType.PowerPoint) {
     setStatus('ppt-tools は PowerPoint 内で実行してください。', 'error');
     return;
   }
-  setStatus('図形を選択して操作を選んでください。');
-  applyButtonStates(0);
-  for (const id of buttonIds) {
-    const btn = document.getElementById(id);
-    if (!(btn instanceof HTMLButtonElement)) continue;
-    btn.addEventListener('click', () => {
-      void runOperation(operations[id]);
-    });
+
+  // The task pane DOM only exists when the user has actually opened the
+  // pane. In shared-runtime mode this script also runs to service ribbon
+  // commands without the pane being visible, so guard against missing
+  // elements before wiring UI handlers.
+  const statusEl = document.getElementById('status');
+  if (statusEl) {
+    setStatus('図形を選択して操作を選んでください。');
+    applyButtonStates(0);
+    for (const id of buttonIds) {
+      const btn = document.getElementById(id);
+      if (!(btn instanceof HTMLButtonElement)) continue;
+      btn.addEventListener('click', () => {
+        void runOperation(operations[id]);
+      });
+    }
   }
 
   Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, () => {
@@ -99,5 +111,16 @@ void Office.onReady((info) => {
   window.addEventListener('focus', () => {
     void refreshButtonStates();
   });
+
+  // PowerPoint's DocumentSelectionChanged event isn't always raised when
+  // the shape selection inside a slide changes (it fires more reliably
+  // for slide-level changes). Poll the selection as a safety net so the
+  // ribbon greys out within ~1 s of the user clicking off all shapes.
+  // setRibbonEnabled is a no-op when the requested state matches the
+  // current one.
+  setInterval(() => {
+    void refreshButtonStates();
+  }, 1000);
+
   void refreshButtonStates();
 });

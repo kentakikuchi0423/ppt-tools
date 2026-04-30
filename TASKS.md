@@ -203,3 +203,17 @@ PowerPoint タスクペイン・アドインを記述する `manifest.xml` を�
 
 - [x] Q1 〜 Q4 がクローズしている（`REQUIREMENTS.md` 末尾「確定済みの設計判断」節）。
 - [x] 選択数に応じたボタンの活性／非活性を実装（`DocumentSelectionChanged` 購読と `window` の focus イベントで再評価。Windows ホスト上での実機確認は Task 10 の範囲）。
+
+---
+
+## Phase 5 — リボン直接呼び出しと QAT 対応（v1 後の追加実装）
+
+実機検証中にユーザーから上がった追加要求への対応。
+
+- [x] **オペレーションごとのアイコン**: 8 種類（メイン + 7 オペレーション）の PNG（16/32/80）を `scripts/generate-icons.mjs` で生成。背景色でカテゴリ分け（pack=青／align=緑／swap=橙）。
+- [x] **リボン直接呼び出し**: `manifest.xml` に各オペレーションの `<Control xsi:type="Button">` + `<Action xsi:type="ExecuteFunction">` を追加。タスクペインを開かなくてもクリックで実行できる。
+- [x] **QAT 対応**: 各リボン control（Menu Item を含む）が「クイック アクセス ツール バーに追加」で個別ピン留め可能。
+- [x] **エラー時のポップアップ**: リボン経由で必要選択数を満たさない操作を実行すると `Office.context.ui.displayDialogAsync` で `dialog.html` を開いて理由文を表示。連続呼び出し時は `BroadcastChannel` + `localStorage` で古いポップアップを閉じてから新しい方を表示。
+- [x] **共有ランタイム（V1.1）**: マニフェストに `<Runtimes lifetime="long">` を追加。`taskpane.ts` を共有ランタイム上で生存させ、選択イベントの継続購読で `Office.ribbon.requestUpdate` を経由してリボンの enable/disable を維持しようと試みる。実際の grayout 動作は host 依存。
+- [x] **ワンクリック起動／再起動**: Windows ユーザー向けに `start.cmd`（証明書 + Vite + サイドロード + PowerPoint 起動）と `reload.cmd`（Office プロセス kill + 全キャッシュ削除 + start.cmd 相当）を追加。
+- [x] **CI**: `.github/workflows/ci.yml` で `format:check` → `validate` → `build` → `manifest:validate` を push / PR 時に実行。
