@@ -34,10 +34,14 @@ Write-Step 'Stopping any active office-addin-debugging session'
 & npx office-addin-debugging stop manifest.xml 2>$null
 & npm run stop:debug 2>$null
 
-Write-Step 'Clearing the Office add-in caches'
+Write-Step 'Clearing the Office add-in caches and Vite build artifacts'
 $paths = @(
   "$env:LOCALAPPDATA\Microsoft\Office\16.0\Wef",
-  "$env:LOCALAPPDATA\Microsoft\Office\16.0\WebExt"
+  "$env:LOCALAPPDATA\Microsoft\Office\16.0\WebExt",
+  "$env:LOCALAPPDATA\Microsoft\Office\OfficeFileCache",
+  "$env:LOCALAPPDATA\Microsoft\Office\16.0\AddinCache",
+  "$projectDir\node_modules\.vite",
+  "$projectDir\dist"
 )
 foreach ($p in $paths) {
   if (Test-Path $p) {

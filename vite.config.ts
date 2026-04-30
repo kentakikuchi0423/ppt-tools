@@ -1,5 +1,5 @@
 import { resolve } from 'node:path';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 
 // office-addin-dev-certs is loaded asynchronously so that `npm run build` and
 // other commands that don't need HTTPS still work even when certs aren't
@@ -21,9 +21,28 @@ async function readDevCerts(): Promise<{ key: Buffer; cert: Buffer; ca: Buffer }
   }
 }
 
+// Force every response to be uncacheable. Without this the WebView2 inside
+// PowerPoint happily clings to a stale taskpane.html across reloads, which
+// makes "I just edited the page but PowerPoint shows yesterday's HTML"
+// debugging sessions painful.
+function noCacheHeadersPlugin(): Plugin {
+  return {
+    name: 'ppt-tools-no-cache-headers',
+    configureServer(server) {
+      server.middlewares.use((_req, res, next) => {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        next();
+      });
+    },
+  };
+}
+
 export default defineConfig(async ({ command }) => {
   const https = command === 'serve' ? await readDevCerts() : undefined;
   return {
+    plugins: [noCacheHeadersPlugin()],
     server: {
       port: 3000,
       strictPort: true,
