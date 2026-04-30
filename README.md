@@ -179,10 +179,18 @@ npm run start:debug
 
 2. Windows ホスト上に「共有フォルダカタログ」用のフォルダを作成します（例：`C:\OfficeAddins\ppt-tools`）。リポジトリ直下の `manifest.xml` をそのフォルダにコピーします。
 
-3. PowerPoint で、その共有フォルダを「信頼できるアドインカタログ」として登録：
+3. **そのフォルダを Windows のファイル共有機能で共有** します（PowerPoint のトラスト センターは UNC パスしか受け付けず、ローカルの `C:\...` は弾かれます）：
+   - フォルダを右クリック → プロパティ → 共有タブ → **「共有」** ボタン
+   - 自分のユーザーに「読み取り/書き込み」権限を付与 → **「共有」** で完了
+   - 表示される **ネットワーク パス**（例: `\\<コンピューター名>\<共有名>`）をコピー
+
+4. PowerPoint で、その共有フォルダを「信頼できるアドインカタログ」として登録：
    - **ファイル → オプション → トラスト センター → トラスト センターの設定 → 信頼できるアドイン カタログ**
-   - 手順 2 のフォルダ URL を追加し、**「メニューに表示する」** にチェックして **OK**。
-   - PowerPoint を再起動。
+   - **「カタログ URL」** に手順 3 でコピーした **`\\` から始まる UNC パス** を貼り付け
+   - **「カタログの追加」** → 表の **「メニューに表示する」** にチェック → **OK**
+   - PowerPoint を再起動
+
+   公式手順は [Microsoft Learn: Sideload Office Add-ins from a network share](https://learn.microsoft.com/en-us/office/dev/add-ins/testing/create-a-network-shared-folder-catalog-for-task-pane-and-content-add-ins) を参照。
 
 ### アドインの起動
 
