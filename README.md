@@ -13,7 +13,7 @@ PowerPoint Office アドイン（VBA ではなく Office.js）。図形操作の
 
 座標計算ロジックは `src/core/` に純粋関数として実装し、Office.js に依存しません。Vitest で完全にユニットテスト可能です。Office.js に依存するアダプタコードは `src/office/` に分離されています。
 
-実装の進行状況は [`TASKS.md`](./TASKS.md)、機能・非機能要件は [`REQUIREMENTS.md`](./REQUIREMENTS.md)、AppSource 等への配布手順は [`PUBLISHING.md`](./PUBLISHING.md) を参照してください。
+実装の進行状況は [`TASKS.md`](./TASKS.md)、機能・非機能要件は [`REQUIREMENTS.md`](./REQUIREMENTS.md)、他 PC への配布手順は本ドキュメント末尾の [「他の PC へ配布する」](#他の-pc-へ配布するappsource-公開なし) を、AppSource 公開を目指す場合は [`PUBLISHING.md`](./PUBLISHING.md) を参照してください。
 
 ## クイックスタート（Windows ユーザー向け）
 
@@ -193,6 +193,43 @@ npm run start:debug
 タスクペインは Vite の HMR でリロードされます。PowerPoint がタスクペインを強くキャッシュすることがあるため、変更が反映されない場合はアドインペインを一度閉じて開き直す、または `reload.cmd` で全キャッシュを削除して再起動してください。
 
 共有フォルダ経由のサイドロードに関する Microsoft 公式ドキュメントは Microsoft Learn を参照してください（検索キーワード: "Sideload Office Add-ins for testing from a network share"）。
+
+## 他の PC へ配布する（AppSource 公開なし）
+
+「自分の PC で確認したものを、知人や同僚の PC でも使ってもらいたい」場合の手順です。**Microsoft の審査は要りません**。
+
+仕組みは「アドイン本体（HTML/JS）は GitHub Pages の HTTPS ホストから配信、マニフェスト XML は配布先 PC のローカルフォルダに置いてトラスト センターに登録」というもの。図形操作はクライアント JS で完結するため、初回ロード以外はオフラインでも動作します（Office.js は CDN 取得後ブラウザにキャッシュ）。
+
+### 開発者（あなた）側 — 1 回だけ
+
+1. **GitHub Pages を有効化**: GitHub のリポジトリ → **Settings → Pages → Source** を **GitHub Actions** に変更。
+2. **デプロイを実行**: リポジトリ → **Actions** タブ → 左メニュー **Deploy to GitHub Pages** → **Run workflow**。完了するとアドインが `https://kentakikuchi0423.github.io/ppt-tools/` 配下から配信される（[`.github/workflows/deploy-pages.yml`](./.github/workflows/deploy-pages.yml) が `npm run build` → `npm run manifest:prod` → Pages デプロイまで自動で実行）。
+3. 公開された `https://kentakikuchi0423.github.io/ppt-tools/manifest.xml` を保存し、配布先の人に渡す（メール添付・社内チャット・USB・共有ドライブ など）。
+
+機能を更新したら、Actions タブから **Run workflow** を再実行するだけ。配布先の PC は次回 PowerPoint 起動時に新しい本体を自動取得します（マニフェスト XML 自体を差し替えない限り、配布先側の追加操作は不要）。
+
+> 自前ドメインや別ホスト（Cloudflare Pages、Azure Static Web Apps など）を使いたい場合は `MANIFEST_HOST=https://example.com/path npm run manifest:prod` でホストを差し替えたマニフェストを生成できます。詳細は [`PUBLISHING.md`](./PUBLISHING.md)。
+
+### 配布先の PC 側 — 1 回だけ（約 5 分）
+
+1. 受け取った `manifest.xml` を任意のフォルダに保存。例：`C:\OfficeAddins\ppt-tools\manifest.xml`
+2. PowerPoint を起動 → **ファイル → オプション → トラスト センター → トラスト センターの設定 → 信頼できるアドイン カタログ**
+3. 手順 1 のフォルダパスを **「カタログ URL」** に追加 → **「メニューに表示する」** にチェック → **OK**
+4. PowerPoint を再起動
+5. **挿入 → 個人用アドイン → 共有フォルダー → ppt-tools → 追加**
+
+以後、ホームタブに `ppt-tools` グループが追加され、リボン／QAT／タスクペインから使えます。アンインストールしたい場合は同じトラスト センター画面でカタログを削除するだけ。
+
+### 開発用と本番用の使い分け
+
+| | dev サイドロード（前節） | 配布用（本節） |
+| --- | --- | --- |
+| 使うマニフェスト | リポジトリ直下の `manifest.xml` | `dist/manifest.xml`（`npm run manifest:prod` で生成） |
+| ホスト | `https://localhost:3000`（`npm run dev` 必須） | `https://kentakikuchi0423.github.io/ppt-tools/`（GitHub Pages） |
+| 必要な準備 | Node 22 + dev-certs インストール | 配布先は何も入れなくて良い（ブラウザの WebView2 のみ） |
+| `<Id>` GUID | dev 用 (`c3f24a1e-...`) | prod 用 (`9f4e74b3-...`) |
+
+dev 用と prod 用は GUID が違うので PowerPoint からは別アドインとして認識されます。両方を同時に登録しても競合しません。
 
 ## 制約・注意
 
