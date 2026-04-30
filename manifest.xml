@@ -7,7 +7,7 @@
     xsi:type="TaskPaneApp">
 
   <Id>c3f24a1e-e4a8-4a54-8d26-ff2db8ed9e0e</Id>
-  <Version>2.0.2.0</Version>
+  <Version>2.0.3.0</Version>
   <ProviderName>ppt-tools</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="ppt-tools" />
@@ -116,35 +116,64 @@
                   </Action>
                 </Control>
 
-                <Control xsi:type="Button" id="PptTools.AlignHeights">
-                  <Label resid="PptTools.AlignHeights.Label" />
+                <Control xsi:type="Menu" id="PptTools.AlignMenu">
+                  <Label resid="PptTools.AlignMenu.Label" />
                   <Supertip>
-                    <Title resid="PptTools.AlignHeights.Label" />
-                    <Description resid="PptTools.AlignHeights.Tooltip" />
+                    <Title resid="PptTools.AlignMenu.Label" />
+                    <Description resid="PptTools.AlignMenu.Tooltip" />
                   </Supertip>
                   <Icon>
                     <bt:Image size="16" resid="Icon.AlignHeights.16x16" />
                     <bt:Image size="32" resid="Icon.AlignHeights.32x32" />
                     <bt:Image size="80" resid="Icon.AlignHeights.80x80" />
                   </Icon>
-                  <Action xsi:type="ExecuteFunction">
-                    <FunctionName>alignHeights</FunctionName>
-                  </Action>
+                  <Items>
+                    <Item id="PptTools.AlignMenu.AlignHeights">
+                      <Label resid="PptTools.AlignHeights.Label" />
+                      <Supertip>
+                        <Title resid="PptTools.AlignHeights.Label" />
+                        <Description resid="PptTools.AlignHeights.Tooltip" />
+                      </Supertip>
+                      <Icon>
+                        <bt:Image size="16" resid="Icon.AlignHeights.16x16" />
+                        <bt:Image size="32" resid="Icon.AlignHeights.32x32" />
+                        <bt:Image size="80" resid="Icon.AlignHeights.80x80" />
+                      </Icon>
+                      <Action xsi:type="ExecuteFunction">
+                        <FunctionName>alignHeights</FunctionName>
+                      </Action>
+                    </Item>
+                    <Item id="PptTools.AlignMenu.AlignWidths">
+                      <Label resid="PptTools.AlignWidths.Label" />
+                      <Supertip>
+                        <Title resid="PptTools.AlignWidths.Label" />
+                        <Description resid="PptTools.AlignWidths.Tooltip" />
+                      </Supertip>
+                      <Icon>
+                        <bt:Image size="16" resid="Icon.AlignWidths.16x16" />
+                        <bt:Image size="32" resid="Icon.AlignWidths.32x32" />
+                        <bt:Image size="80" resid="Icon.AlignWidths.80x80" />
+                      </Icon>
+                      <Action xsi:type="ExecuteFunction">
+                        <FunctionName>alignWidths</FunctionName>
+                      </Action>
+                    </Item>
+                  </Items>
                 </Control>
 
-                <Control xsi:type="Button" id="PptTools.AlignWidths">
-                  <Label resid="PptTools.AlignWidths.Label" />
+                <Control xsi:type="Button" id="PptTools.SwapPositions">
+                  <Label resid="PptTools.SwapPositions.Label" />
                   <Supertip>
-                    <Title resid="PptTools.AlignWidths.Label" />
-                    <Description resid="PptTools.AlignWidths.Tooltip" />
+                    <Title resid="PptTools.SwapPositions.Label" />
+                    <Description resid="PptTools.SwapPositions.Tooltip" />
                   </Supertip>
                   <Icon>
-                    <bt:Image size="16" resid="Icon.AlignWidths.16x16" />
-                    <bt:Image size="32" resid="Icon.AlignWidths.32x32" />
-                    <bt:Image size="80" resid="Icon.AlignWidths.80x80" />
+                    <bt:Image size="16" resid="Icon.Swap.16x16" />
+                    <bt:Image size="32" resid="Icon.Swap.32x32" />
+                    <bt:Image size="80" resid="Icon.Swap.80x80" />
                   </Icon>
                   <Action xsi:type="ExecuteFunction">
-                    <FunctionName>alignWidths</FunctionName>
+                    <FunctionName>swapPositions</FunctionName>
                   </Action>
                 </Control>
               </Group>
