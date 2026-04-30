@@ -1,42 +1,35 @@
 // Updates the enabled/disabled state of the ppt-tools ribbon controls in
 // response to selection changes, so the user can tell at a glance which
 // operations make sense for the current selection.
+//
+// IDs match the V1.1 manifest section (modern PowerPoint Microsoft 365
+// hosts use V1.1 with shared runtime). On a V1.0-only host the
+// RibbonApi 1.1 requirement set isn't supported anyway, so the no-op
+// path covers it.
 
 const TAB_ID = 'TabHome';
-const GROUP_ID = 'PptTools.MainGroup';
 
-const CONTROL_IDS = [
-  'PptTools.PackDown',
-  'PptTools.PackUp',
-  'PptTools.PackLeft',
-  'PptTools.PackRight',
-  'PptTools.AlignMenu',
-  'PptTools.SwapPositions',
-] as const;
+const GROUPS: readonly { id: string; controls: readonly string[] }[] = [
+  {
+    id: 'PptTools.PackGroup',
+    controls: [
+      'PptTools.V11.PackDown',
+      'PptTools.V11.PackUp',
+      'PptTools.V11.PackLeft',
+      'PptTools.V11.PackRight',
+    ],
+  },
+  {
+    id: 'PptTools.AlignGroup',
+    controls: ['PptTools.V11.AlignHeights', 'PptTools.V11.AlignWidths'],
+  },
+  {
+    id: 'PptTools.SwapGroup',
+    controls: ['PptTools.V11.SwapPositions'],
+  },
+];
 
-export type RibbonStatus =
-  | { kind: 'pending' }
-  | { kind: 'unsupported' }
-  | { kind: 'ok' }
-  | { kind: 'error'; message: string };
-
-let lastStatus: RibbonStatus = { kind: 'pending' };
-const listeners = new Set<(status: RibbonStatus) => void>();
-
-function setStatus(next: RibbonStatus): void {
-  lastStatus = next;
-  for (const listener of listeners) listener(next);
-}
-
-export function getRibbonStatus(): RibbonStatus {
-  return lastStatus;
-}
-
-export function onRibbonStatusChange(listener: (status: RibbonStatus) => void): () => void {
-  listeners.add(listener);
-  listener(lastStatus);
-  return () => listeners.delete(listener);
-}
+let warnedNoRibbonApi = false;
 
 function ribbonApiSupported(): boolean {
   try {
@@ -47,13 +40,15 @@ function ribbonApiSupported(): boolean {
 }
 
 export async function setRibbonEnabled(enabled: boolean): Promise<void> {
-  if (typeof Office === 'undefined') {
-    setStatus({ kind: 'error', message: 'Office not available' });
-    return;
-  }
+  if (typeof Office === 'undefined') return;
 
   if (!ribbonApiSupported()) {
-    setStatus({ kind: 'unsupported' });
+    if (!warnedNoRibbonApi) {
+      warnedNoRibbonApi = true;
+      console.warn(
+        '[ppt-tools] RibbonApi 1.1 not supported in this Office host — ribbon controls will not grey out.',
+      );
+    }
     return;
   }
 
@@ -62,19 +57,14 @@ export async function setRibbonEnabled(enabled: boolean): Promise<void> {
       tabs: [
         {
           id: TAB_ID,
-          groups: [
-            {
-              id: GROUP_ID,
-              controls: CONTROL_IDS.map((id) => ({ id, enabled })),
-            },
-          ],
+          groups: GROUPS.map((g) => ({
+            id: g.id,
+            controls: g.controls.map((id) => ({ id, enabled })),
+          })),
         },
       ],
     });
-    setStatus({ kind: 'ok' });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
     console.error('[ppt-tools] Office.ribbon.requestUpdate failed:', err);
-    setStatus({ kind: 'error', message });
   }
 }
