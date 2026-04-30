@@ -1,29 +1,17 @@
-// Shared registration of ribbon-button ExecuteFunction handlers.
-//
-// Called from both commands.ts (V1.0 fallback path, where the FunctionFile
-// loads commands.html on every ribbon click) and taskpane.ts (V1.1 shared
-// runtime path, where the FunctionFile and task pane share one persistent
-// runtime started from taskpane.html).
+// Registers Office.actions handlers shared between the V1.0 fallback
+// path (commands.html loads commands.ts on each ribbon click) and the
+// V1.1 shared-runtime path (taskpane.html keeps a persistent runtime).
 //
 // Validation failures (wrong selection count, missing reference shape, …)
-// are surfaced via a small Office Dialog popup since ribbon commands have
-// no other UI surface. Multiple rapid clicks broadcast their popup id over
-// a BroadcastChannel + localStorage so the older dialog dismisses itself
-// when a newer one is requested.
+// surface via a small Office Dialog popup. Multiple rapid clicks
+// broadcast their popup id over a BroadcastChannel + localStorage so the
+// older dialog dismisses itself when a newer one is requested.
 
-import { alignHeights } from '../core/operations/alignHeights.js';
-import { alignWidths } from '../core/operations/alignWidths.js';
-import { packDown, packLeft, packRight, packUp } from '../core/operations/pack.js';
-import { swapPositions } from '../core/operations/swap.js';
-import { LastSelectedResolver } from '../core/resolvers/lastSelected.js';
-import type { OperationResult, Shape } from '../core/types.js';
+import type { Op } from '../core/types.js';
+import { POPUP_CHANNEL, POPUP_STORAGE_KEY } from '../dialog/popup-channel.js';
+import { OPERATIONS } from './operations.js';
 import { setRibbonEnabled } from './ribbon.js';
 import { applyShapes, getSelectedShapes } from './selection.js';
-
-type Op = (shapes: readonly Shape[]) => OperationResult;
-
-const POPUP_CHANNEL = 'ppt-tools-dialog';
-const POPUP_STORAGE_KEY = 'pptToolsLatestPopupId';
 
 function broadcastNewPopup(popupId: string): void {
   try {
@@ -37,7 +25,7 @@ function broadcastNewPopup(popupId: string): void {
   try {
     localStorage.setItem(POPUP_STORAGE_KEY, popupId);
   } catch {
-    // Ignore — best-effort.
+    // Best-effort.
   }
 }
 
@@ -72,9 +60,9 @@ async function showPopup(message: string): Promise<void> {
   const popupId = String(Date.now());
   broadcastNewPopup(popupId);
   // Try opening immediately. If no other dialog is currently open this
-  // succeeds and the user sees the popup with no artificial delay. If a
-  // previous dialog is still being dismissed, the open fails — give it a
-  // short window to react to the broadcast above and retry a few times.
+  // succeeds with no artificial delay. If a previous dialog is still
+  // being dismissed, retry briefly to give it time to react to the
+  // broadcast above.
   if (await tryOpenDialog(message, popupId)) return;
   for (let attempt = 0; attempt < 3; attempt++) {
     await sleep(200);
@@ -99,7 +87,7 @@ async function runFromRibbon(op: Op, event: Office.AddinCommands.Event): Promise
       const after = await getSelectedShapes();
       await setRibbonEnabled(after.length >= 1);
     } catch {
-      // Ignore — leave the ribbon in its previous state.
+      // Leave the ribbon in its previous state.
     }
     event.completed();
   }
@@ -116,17 +104,7 @@ let registered = false;
 export function registerRibbonActions(): void {
   if (registered) return;
   registered = true;
-  Office.actions.associate('packDown', ribbonCommand(packDown));
-  Office.actions.associate('packUp', ribbonCommand(packUp));
-  Office.actions.associate('packLeft', ribbonCommand(packLeft));
-  Office.actions.associate('packRight', ribbonCommand(packRight));
-  Office.actions.associate(
-    'alignHeights',
-    ribbonCommand((s) => alignHeights(s, LastSelectedResolver)),
-  );
-  Office.actions.associate(
-    'alignWidths',
-    ribbonCommand((s) => alignWidths(s, LastSelectedResolver)),
-  );
-  Office.actions.associate('swapPositions', ribbonCommand(swapPositions));
+  for (const { actionName, run } of OPERATIONS) {
+    Office.actions.associate(actionName, ribbonCommand(run));
+  }
 }

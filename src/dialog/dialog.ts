@@ -1,7 +1,5 @@
+import { POPUP_CHANNEL, POPUP_STORAGE_KEY } from './popup-channel.js';
 import './dialog.css';
-
-const POPUP_CHANNEL = 'ppt-tools-dialog';
-const POPUP_STORAGE_KEY = 'pptToolsLatestPopupId';
 
 const params = new URLSearchParams(window.location.search);
 const myId = params.get('id') ?? '';
@@ -12,13 +10,13 @@ if (messageEl) {
 }
 
 function selfClose(): void {
-  // The dialog is opened by commands.ts via displayDialogAsync, which
+  // The dialog is opened by actions.ts via displayDialogAsync, which
   // listens for messageParent and calls dialog.close() on receipt.
   Office.context.ui.messageParent('close');
 }
 
-// Fallback signal: poll localStorage every 250 ms in case
-// BroadcastChannel isn't supported in this dialog runtime.
+// Fallback signal: poll localStorage every 250 ms in case BroadcastChannel
+// isn't supported in this dialog runtime.
 const pollIntervalId = window.setInterval(() => {
   let latest: string | null = null;
   try {
@@ -32,9 +30,9 @@ const pollIntervalId = window.setInterval(() => {
   }
 }, 250);
 
-// Primary signal: newer popups broadcast over BroadcastChannel. If the
-// new id differs from ours, this dialog is stale — close itself so the
-// new dialog can take its place.
+// Primary signal: newer popups broadcast over BroadcastChannel. If the new
+// id differs from ours, this dialog is stale — close itself so the new
+// dialog can take its place.
 try {
   const channel = new BroadcastChannel(POPUP_CHANNEL);
   channel.addEventListener('message', (event: MessageEvent) => {

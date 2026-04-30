@@ -29,3 +29,10 @@ export interface ReferenceShapeResolver {
 export type OperationResult =
   | { readonly ok: true; readonly shapes: readonly Shape[] }
   | { readonly ok: false; readonly reason: string };
+
+/**
+ * Signature shared by all 7 ribbon/task-pane operations. The caller (the
+ * Office layer) supplies the current selection; the pure operation returns
+ * either updated shapes or a failure reason.
+ */
+export type Op = (shapes: readonly Shape[]) => OperationResult;

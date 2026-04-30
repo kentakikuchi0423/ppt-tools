@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { alignHeights } from '../../src/core/operations/alignHeights.js';
+import { alignHeights } from '../../src/core/operations/align.js';
 import { LastSelectedResolver } from '../../src/core/resolvers/lastSelected.js';
 import { StoredReferenceResolver } from '../../src/core/resolvers/storedReference.js';
 import type { ReferenceShapeResolver, Shape } from '../../src/core/types.js';
