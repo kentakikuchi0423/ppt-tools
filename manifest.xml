@@ -7,7 +7,7 @@
     xsi:type="TaskPaneApp">
 
   <Id>c3f24a1e-e4a8-4a54-8d26-ff2db8ed9e0e</Id>
-  <Version>1.0.4.0</Version>
+  <Version>1.0.5.0</Version>
   <ProviderName>ppt-tools</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="ppt-tools" />
@@ -47,11 +47,12 @@
               <!--
                 PowerPoint sideloaded TaskPaneApps render only the first
                 OfficeTab Group and cap each Group at six controls.
-                Layout: four pack buttons stay top-level (one-click QAT
-                pinning); align + swap live in a single Menu so all
-                three remain reachable. Menu items can be pinned to the
-                QAT individually, so every operation can be promoted to
-                a one-click shortcut.
+                Layout (6 controls): four pack buttons stay top-level,
+                the two align operations are grouped into a single
+                "高さ/幅を揃える" Menu, and swap-positions stays
+                top-level. Menu items are individually pinnable to the
+                QAT, so every operation can be promoted to a one-click
+                shortcut.
               -->
               <Group id="PptTools.MainGroup">
                 <Label resid="PptTools.MainGroup.Label" />
@@ -125,11 +126,11 @@
                   </Action>
                 </Control>
 
-                <Control xsi:type="Menu" id="PptTools.AlignSwapMenu">
-                  <Label resid="PptTools.AlignSwapMenu.Label" />
+                <Control xsi:type="Menu" id="PptTools.AlignMenu">
+                  <Label resid="PptTools.AlignMenu.Label" />
                   <Supertip>
-                    <Title resid="PptTools.AlignSwapMenu.Label" />
-                    <Description resid="PptTools.AlignSwapMenu.Tooltip" />
+                    <Title resid="PptTools.AlignMenu.Label" />
+                    <Description resid="PptTools.AlignMenu.Tooltip" />
                   </Supertip>
                   <Icon>
                     <bt:Image size="16" resid="Icon.AlignHeights.16x16" />
@@ -137,7 +138,7 @@
                     <bt:Image size="80" resid="Icon.AlignHeights.80x80" />
                   </Icon>
                   <Items>
-                    <Item id="PptTools.AlignSwapMenu.AlignHeights">
+                    <Item id="PptTools.AlignMenu.AlignHeights">
                       <Label resid="PptTools.AlignHeights.Label" />
                       <Supertip>
                         <Title resid="PptTools.AlignHeights.Label" />
@@ -152,7 +153,7 @@
                         <FunctionName>alignHeights</FunctionName>
                       </Action>
                     </Item>
-                    <Item id="PptTools.AlignSwapMenu.AlignWidths">
+                    <Item id="PptTools.AlignMenu.AlignWidths">
                       <Label resid="PptTools.AlignWidths.Label" />
                       <Supertip>
                         <Title resid="PptTools.AlignWidths.Label" />
@@ -167,22 +168,23 @@
                         <FunctionName>alignWidths</FunctionName>
                       </Action>
                     </Item>
-                    <Item id="PptTools.AlignSwapMenu.SwapPositions">
-                      <Label resid="PptTools.SwapPositions.Label" />
-                      <Supertip>
-                        <Title resid="PptTools.SwapPositions.Label" />
-                        <Description resid="PptTools.SwapPositions.Tooltip" />
-                      </Supertip>
-                      <Icon>
-                        <bt:Image size="16" resid="Icon.Swap.16x16" />
-                        <bt:Image size="32" resid="Icon.Swap.32x32" />
-                        <bt:Image size="80" resid="Icon.Swap.80x80" />
-                      </Icon>
-                      <Action xsi:type="ExecuteFunction">
-                        <FunctionName>swapPositions</FunctionName>
-                      </Action>
-                    </Item>
                   </Items>
+                </Control>
+
+                <Control xsi:type="Button" id="PptTools.SwapPositions">
+                  <Label resid="PptTools.SwapPositions.Label" />
+                  <Supertip>
+                    <Title resid="PptTools.SwapPositions.Label" />
+                    <Description resid="PptTools.SwapPositions.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.Swap.16x16" />
+                    <bt:Image size="32" resid="Icon.Swap.32x32" />
+                    <bt:Image size="80" resid="Icon.Swap.80x80" />
+                  </Icon>
+                  <Action xsi:type="ExecuteFunction">
+                    <FunctionName>swapPositions</FunctionName>
+                  </Action>
                 </Control>
               </Group>
             </OfficeTab>
@@ -230,7 +232,7 @@
         <bt:String id="PptTools.PackUp.Label" DefaultValue="上に詰める" />
         <bt:String id="PptTools.PackLeft.Label" DefaultValue="左に詰める" />
         <bt:String id="PptTools.PackRight.Label" DefaultValue="右に詰める" />
-        <bt:String id="PptTools.AlignSwapMenu.Label" DefaultValue="揃え・入れ替え" />
+        <bt:String id="PptTools.AlignMenu.Label" DefaultValue="高さ/幅を揃える" />
         <bt:String id="PptTools.AlignHeights.Label" DefaultValue="高さを揃える" />
         <bt:String id="PptTools.AlignWidths.Label" DefaultValue="幅を揃える" />
         <bt:String id="PptTools.SwapPositions.Label" DefaultValue="位置を入れ替える" />
@@ -241,7 +243,7 @@
         <bt:String id="PptTools.PackUp.Tooltip" DefaultValue="選択中の図形を上端へ詰めます（最も上の図形を固定し、下の図形が上方向に詰まる）。" />
         <bt:String id="PptTools.PackLeft.Tooltip" DefaultValue="選択中の図形を左端へ詰めます（最も左の図形を固定し、右の図形が左方向に詰まる）。" />
         <bt:String id="PptTools.PackRight.Tooltip" DefaultValue="選択中の図形を右端へ詰めます（最も右の図形を固定し、左の図形が右方向に詰まる）。" />
-        <bt:String id="PptTools.AlignSwapMenu.Tooltip" DefaultValue="図形の高さ・幅を揃える、または 2 つの図形の位置を入れ替えます。" />
+        <bt:String id="PptTools.AlignMenu.Tooltip" DefaultValue="選択中の図形の高さまたは幅を、最後にクリックした図形に揃えます。" />
         <bt:String id="PptTools.AlignHeights.Tooltip" DefaultValue="選択中の図形の高さを、最後にクリックした図形の高さに揃えます。" />
         <bt:String id="PptTools.AlignWidths.Tooltip" DefaultValue="選択中の図形の幅を、最後にクリックした図形の幅に揃えます。" />
         <bt:String id="PptTools.SwapPositions.Tooltip" DefaultValue="選択中のちょうど 2 つの図形の位置（left/top）を入れ替えます。サイズは保持。" />
