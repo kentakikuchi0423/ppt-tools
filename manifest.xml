@@ -7,7 +7,7 @@
     xsi:type="TaskPaneApp">
 
   <Id>c3f24a1e-e4a8-4a54-8d26-ff2db8ed9e0e</Id>
-  <Version>2.0.0.0</Version>
+  <Version>2.0.1.0</Version>
   <ProviderName>ppt-tools</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="ppt-tools" />
@@ -224,11 +224,6 @@
       stays a one-click QAT-pinnable button.
     -->
     <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
-      <Requirements>
-        <bt:Sets DefaultMinVersion="1.1">
-          <bt:Set Name="SharedRuntime" MinVersion="1.1" />
-        </bt:Sets>
-      </Requirements>
       <Hosts>
         <Host xsi:type="Presentation">
           <Runtimes>
