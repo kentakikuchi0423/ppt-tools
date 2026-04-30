@@ -273,7 +273,7 @@
 
             <ExtensionPoint xsi:type="PrimaryCommandSurface">
               <OfficeTab id="TabHome">
-                <Group id="PptTools.V11.MainGroup">
+                <Group id="PptTools.MainGroup">
                   <Label resid="PptTools.MainGroup.Label" />
                   <Icon>
                     <bt:Image size="16" resid="Icon.16x16" />
@@ -281,7 +281,7 @@
                     <bt:Image size="80" resid="Icon.80x80" />
                   </Icon>
 
-                  <Control xsi:type="Button" id="PptTools.V11.PackDown">
+                  <Control xsi:type="Button" id="PptTools.PackDown">
                     <Label resid="PptTools.PackDown.Label" />
                     <Supertip>
                       <Title resid="PptTools.PackDown.Label" />
@@ -297,7 +297,7 @@
                     </Action>
                   </Control>
 
-                  <Control xsi:type="Button" id="PptTools.V11.PackUp">
+                  <Control xsi:type="Button" id="PptTools.PackUp">
                     <Label resid="PptTools.PackUp.Label" />
                     <Supertip>
                       <Title resid="PptTools.PackUp.Label" />
@@ -313,7 +313,7 @@
                     </Action>
                   </Control>
 
-                  <Control xsi:type="Button" id="PptTools.V11.PackLeft">
+                  <Control xsi:type="Button" id="PptTools.PackLeft">
                     <Label resid="PptTools.PackLeft.Label" />
                     <Supertip>
                       <Title resid="PptTools.PackLeft.Label" />
@@ -329,7 +329,7 @@
                     </Action>
                   </Control>
 
-                  <Control xsi:type="Button" id="PptTools.V11.PackRight">
+                  <Control xsi:type="Button" id="PptTools.PackRight">
                     <Label resid="PptTools.PackRight.Label" />
                     <Supertip>
                       <Title resid="PptTools.PackRight.Label" />
@@ -345,7 +345,7 @@
                     </Action>
                   </Control>
 
-                  <Control xsi:type="Menu" id="PptTools.V11.AlignMenu">
+                  <Control xsi:type="Menu" id="PptTools.AlignMenu">
                     <Label resid="PptTools.AlignMenu.Label" />
                     <Supertip>
                       <Title resid="PptTools.AlignMenu.Label" />
@@ -357,7 +357,7 @@
                       <bt:Image size="80" resid="Icon.AlignHeights.80x80" />
                     </Icon>
                     <Items>
-                      <Item id="PptTools.V11.AlignMenu.AlignHeights">
+                      <Item id="PptTools.AlignMenu.AlignHeights">
                         <Label resid="PptTools.AlignHeights.Label" />
                         <Supertip>
                           <Title resid="PptTools.AlignHeights.Label" />
@@ -372,7 +372,7 @@
                           <FunctionName>alignHeights</FunctionName>
                         </Action>
                       </Item>
-                      <Item id="PptTools.V11.AlignMenu.AlignWidths">
+                      <Item id="PptTools.AlignMenu.AlignWidths">
                         <Label resid="PptTools.AlignWidths.Label" />
                         <Supertip>
                           <Title resid="PptTools.AlignWidths.Label" />
@@ -390,7 +390,7 @@
                     </Items>
                   </Control>
 
-                  <Control xsi:type="Button" id="PptTools.V11.SwapPositions">
+                  <Control xsi:type="Button" id="PptTools.SwapPositions">
                     <Label resid="PptTools.SwapPositions.Label" />
                     <Supertip>
                       <Title resid="PptTools.SwapPositions.Label" />

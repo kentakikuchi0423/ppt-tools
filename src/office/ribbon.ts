@@ -2,21 +2,21 @@
 // response to selection changes, so the user can tell at a glance which
 // operations make sense for the current selection.
 //
-// IDs match the V1.1 manifest section (modern PowerPoint Microsoft 365
-// hosts use V1.1 with shared runtime). On a V1.0-only host the
-// RibbonApi 1.1 requirement set isn't supported anyway, so the no-op
-// path covers it.
+// IDs are shared between the V1.0 fallback and the V1.1 shared-runtime
+// blocks of manifest.xml. Whichever block the host accepts, the same ID
+// is what's actually rendered, so a single requestUpdate covers both
+// paths.
 
 const TAB_ID = 'TabHome';
-const GROUP_ID = 'PptTools.V11.MainGroup';
+const GROUP_ID = 'PptTools.MainGroup';
 
 const CONTROL_IDS = [
-  'PptTools.V11.PackDown',
-  'PptTools.V11.PackUp',
-  'PptTools.V11.PackLeft',
-  'PptTools.V11.PackRight',
-  'PptTools.V11.AlignMenu',
-  'PptTools.V11.SwapPositions',
+  'PptTools.PackDown',
+  'PptTools.PackUp',
+  'PptTools.PackLeft',
+  'PptTools.PackRight',
+  'PptTools.AlignMenu',
+  'PptTools.SwapPositions',
 ] as const;
 
 let warnedNoRibbonApi = false;

@@ -111,5 +111,16 @@ void Office.onReady((info) => {
   window.addEventListener('focus', () => {
     void refreshButtonStates();
   });
+
+  // PowerPoint's DocumentSelectionChanged event isn't always raised when
+  // the shape selection inside a slide changes (it fires more reliably
+  // for slide-level changes). Poll the selection as a safety net so the
+  // ribbon greys out within ~1 s of the user clicking off all shapes.
+  // setRibbonEnabled is a no-op when the requested state matches the
+  // current one.
+  setInterval(() => {
+    void refreshButtonStates();
+  }, 1000);
+
   void refreshButtonStates();
 });
