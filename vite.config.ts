@@ -44,6 +44,7 @@ export default defineConfig(async ({ command }) => {
         input: {
           taskpane: resolve(import.meta.dirname, 'taskpane.html'),
           commands: resolve(import.meta.dirname, 'commands.html'),
+          dialog: resolve(import.meta.dirname, 'dialog.html'),
         },
       },
     },

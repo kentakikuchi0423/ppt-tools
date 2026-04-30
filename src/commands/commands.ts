@@ -4,9 +4,9 @@
 // manifest <Control> run the operation directly from the ribbon (or the
 // Quick Access Toolbar, once the user pins one of these buttons there).
 //
-// Failure mode: ribbon commands have no UI surface for error toasts, so
-// we log to the runtime log and silently complete. For interactive
-// feedback the user can still open the task pane.
+// Validation failures (wrong selection count, missing reference shape,
+// etc.) are surfaced to the user via a small Office Dialog popup since
+// ribbon commands have no other UI surface.
 
 import { alignHeights } from '../core/operations/alignHeights.js';
 import { alignWidths } from '../core/operations/alignWidths.js';
@@ -18,6 +18,28 @@ import { applyShapes, getSelectedShapes } from '../office/selection.js';
 
 type Op = (shapes: readonly Shape[]) => OperationResult;
 
+function showPopup(message: string): void {
+  const url = `${window.location.origin}/dialog.html?msg=${encodeURIComponent(message)}`;
+  Office.context.ui.displayDialogAsync(
+    url,
+    { height: 25, width: 30, displayInIframe: false },
+    (asyncResult) => {
+      if (asyncResult.status !== Office.AsyncResultStatus.Succeeded) {
+        console.error('Failed to open ppt-tools popup:', asyncResult.error);
+        return;
+      }
+      const dialog = asyncResult.value;
+      dialog.addEventHandler(Office.EventType.DialogMessageReceived, () => {
+        dialog.close();
+      });
+      dialog.addEventHandler(Office.EventType.DialogEventReceived, () => {
+        // Fires when the user closes the dialog via the X button.
+        // No-op — the dialog object is already invalidated.
+      });
+    },
+  );
+}
+
 async function runFromRibbon(op: Op, event: Office.AddinCommands.Event): Promise<void> {
   try {
     const shapes = await getSelectedShapes();
@@ -25,10 +47,10 @@ async function runFromRibbon(op: Op, event: Office.AddinCommands.Event): Promise
     if (result.ok) {
       await applyShapes(result.shapes);
     } else {
-      console.warn('ppt-tools ribbon command rejected:', result.reason);
+      showPopup(result.reason);
     }
   } catch (err) {
-    console.error('ppt-tools ribbon command failed:', err);
+    showPopup(err instanceof Error ? err.message : String(err));
   } finally {
     event.completed();
   }
