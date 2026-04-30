@@ -13,7 +13,7 @@ PowerPoint Office アドイン（VBA ではなく Office.js）。図形操作の
 
 座標計算ロジックは `src/core/` に純粋関数として実装し、Office.js に依存しません。Vitest で完全にユニットテスト可能です。Office.js に依存するアダプタコードは `src/office/` に分離されています。
 
-実装の進行状況は [`TASKS.md`](./TASKS.md)、機能・非機能要件は [`REQUIREMENTS.md`](./REQUIREMENTS.md) を参照してください。
+実装の進行状況は [`TASKS.md`](./TASKS.md)、機能・非機能要件は [`REQUIREMENTS.md`](./REQUIREMENTS.md)、AppSource 等への配布手順は [`PUBLISHING.md`](./PUBLISHING.md) を参照してください。
 
 ## クイックスタート（Windows ユーザー向け）
 
@@ -204,4 +204,4 @@ npm run start:debug
 
 ## ライセンス
 
-公開（AppSource やストア配布）を視野に開発中です。配布前に正式なライセンス文を `LICENSE` ファイルとして同梱します。
+[MIT License](./LICENSE)。プライバシーポリシーは [`PRIVACY.md`](./PRIVACY.md) を参照。
