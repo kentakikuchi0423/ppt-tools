@@ -11,7 +11,15 @@
   </head>
   <body>
     <main id="app">
-      <h1>ppt-tools</h1>
+      <h1>ppt-tools <span class="version">(v1.0.6)</span></h1>
+      <p
+        id="ribbon-status"
+        class="diagnostic"
+        role="status"
+        aria-live="polite"
+      >
+        リボン連動: 確認中…
+      </p>
       <section aria-label="詰める">
         <h2>詰める</h2>
         <div class="row">
@@ -55,9 +63,6 @@
       </section>
       <section aria-label="ステータス" id="status-section">
         <p id="status" role="status" aria-live="polite">読み込み中…</p>
-        <p id="ribbon-status" class="diagnostic" aria-live="polite">
-          リボン連動: 確認中…
-        </p>
       </section>
     </main>
     <script type="module" src="/src/taskpane/taskpane.ts"></script>
