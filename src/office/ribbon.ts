@@ -8,26 +8,16 @@
 // path covers it.
 
 const TAB_ID = 'TabHome';
+const GROUP_ID = 'PptTools.V11.MainGroup';
 
-const GROUPS: readonly { id: string; controls: readonly string[] }[] = [
-  {
-    id: 'PptTools.PackGroup',
-    controls: [
-      'PptTools.V11.PackDown',
-      'PptTools.V11.PackUp',
-      'PptTools.V11.PackLeft',
-      'PptTools.V11.PackRight',
-    ],
-  },
-  {
-    id: 'PptTools.AlignGroup',
-    controls: ['PptTools.V11.AlignHeights', 'PptTools.V11.AlignWidths'],
-  },
-  {
-    id: 'PptTools.SwapGroup',
-    controls: ['PptTools.V11.SwapPositions'],
-  },
-];
+const CONTROL_IDS = [
+  'PptTools.V11.PackDown',
+  'PptTools.V11.PackUp',
+  'PptTools.V11.PackLeft',
+  'PptTools.V11.PackRight',
+  'PptTools.V11.AlignMenu',
+  'PptTools.V11.SwapPositions',
+] as const;
 
 let warnedNoRibbonApi = false;
 
@@ -57,10 +47,12 @@ export async function setRibbonEnabled(enabled: boolean): Promise<void> {
       tabs: [
         {
           id: TAB_ID,
-          groups: GROUPS.map((g) => ({
-            id: g.id,
-            controls: g.controls.map((id) => ({ id, enabled })),
-          })),
+          groups: [
+            {
+              id: GROUP_ID,
+              controls: CONTROL_IDS.map((id) => ({ id, enabled })),
+            },
+          ],
         },
       ],
     });
