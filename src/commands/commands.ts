@@ -14,6 +14,7 @@ import { packDown, packLeft, packRight, packUp } from '../core/operations/pack.j
 import { swapPositions } from '../core/operations/swap.js';
 import { LastSelectedResolver } from '../core/resolvers/lastSelected.js';
 import type { OperationResult, Shape } from '../core/types.js';
+import { setRibbonEnabled } from '../office/ribbon.js';
 import { applyShapes, getSelectedShapes } from '../office/selection.js';
 
 type Op = (shapes: readonly Shape[]) => OperationResult;
@@ -22,7 +23,7 @@ function showPopup(message: string): void {
   const url = `${window.location.origin}/dialog.html?msg=${encodeURIComponent(message)}`;
   Office.context.ui.displayDialogAsync(
     url,
-    { height: 25, width: 30, displayInIframe: false },
+    { height: 22, width: 20, displayInIframe: false },
     (asyncResult) => {
       if (asyncResult.status !== Office.AsyncResultStatus.Succeeded) {
         console.error('Failed to open ppt-tools popup:', asyncResult.error);
@@ -52,6 +53,16 @@ async function runFromRibbon(op: Op, event: Office.AddinCommands.Event): Promise
   } catch (err) {
     showPopup(err instanceof Error ? err.message : String(err));
   } finally {
+    // Refresh the ribbon's enabled state so the next click sees the
+    // post-operation selection. The taskpane (when open) handles live
+    // updates via the DocumentSelectionChanged event; this covers the
+    // case where the user only uses the ribbon.
+    try {
+      const after = await getSelectedShapes();
+      await setRibbonEnabled(after.length >= 1);
+    } catch {
+      // Ignore — leave the ribbon in its previous state.
+    }
     event.completed();
   }
 }

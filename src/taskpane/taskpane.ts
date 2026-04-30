@@ -4,6 +4,7 @@ import { packDown, packLeft, packRight, packUp } from '../core/operations/pack.j
 import { swapPositions } from '../core/operations/swap.js';
 import { LastSelectedResolver } from '../core/resolvers/lastSelected.js';
 import type { OperationResult, Shape } from '../core/types.js';
+import { setRibbonEnabled } from '../office/ribbon.js';
 import { applyShapes, getSelectedShapes } from '../office/selection.js';
 import './taskpane.css';
 
@@ -49,12 +50,15 @@ function setStatus(msg: string, kind: 'info' | 'error' = 'info'): void {
 }
 
 async function refreshButtonStates(): Promise<void> {
+  let count = 0;
   try {
     const shapes = await getSelectedShapes();
-    applyButtonStates(shapes.length);
+    count = shapes.length;
   } catch {
-    applyButtonStates(0);
+    count = 0;
   }
+  applyButtonStates(count);
+  await setRibbonEnabled(count >= 1);
 }
 
 async function runOperation(op: Op): Promise<void> {
