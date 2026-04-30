@@ -54,6 +54,10 @@ function renderRibbonStatus(status: RibbonStatus): void {
   const el = document.getElementById('ribbon-status');
   if (!el) return;
   switch (status.kind) {
+    case 'pending':
+      el.textContent = 'リボン連動: 確認中…';
+      el.dataset['kind'] = 'info';
+      break;
     case 'ok':
       el.textContent = 'リボン連動: 有効（選択数に応じてグレーアウトします）';
       el.dataset['kind'] = 'info';
@@ -69,6 +73,12 @@ function renderRibbonStatus(status: RibbonStatus): void {
       break;
   }
 }
+
+// Register the ribbon status listener immediately so the diagnostic line
+// renders even if Office.onReady is slow, fails, or fires with a non-
+// PowerPoint host. The listener fires synchronously with the current
+// status on subscription.
+onRibbonStatusChange(renderRibbonStatus);
 
 async function refreshButtonStates(): Promise<void> {
   let count = 0;
@@ -113,8 +123,6 @@ void Office.onReady((info) => {
       void runOperation(operations[id]);
     });
   }
-
-  onRibbonStatusChange(renderRibbonStatus);
 
   Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, () => {
     void refreshButtonStates();

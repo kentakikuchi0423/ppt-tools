@@ -15,11 +15,12 @@ const CONTROL_IDS = [
 ] as const;
 
 export type RibbonStatus =
+  | { kind: 'pending' }
   | { kind: 'unsupported' }
   | { kind: 'ok' }
   | { kind: 'error'; message: string };
 
-let lastStatus: RibbonStatus = { kind: 'ok' };
+let lastStatus: RibbonStatus = { kind: 'pending' };
 const listeners = new Set<(status: RibbonStatus) => void>();
 
 function setStatus(next: RibbonStatus): void {
