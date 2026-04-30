@@ -4,7 +4,8 @@ import { packDown, packLeft, packRight, packUp } from '../core/operations/pack.j
 import { swapPositions } from '../core/operations/swap.js';
 import { LastSelectedResolver } from '../core/resolvers/lastSelected.js';
 import type { OperationResult, Shape } from '../core/types.js';
-import { setRibbonEnabled } from '../office/ribbon.js';
+import { onRibbonStatusChange, setRibbonEnabled } from '../office/ribbon.js';
+import type { RibbonStatus } from '../office/ribbon.js';
 import { applyShapes, getSelectedShapes } from '../office/selection.js';
 import './taskpane.css';
 
@@ -47,6 +48,26 @@ function setStatus(msg: string, kind: 'info' | 'error' = 'info'): void {
   if (!el) return;
   el.textContent = msg;
   el.dataset['kind'] = kind;
+}
+
+function renderRibbonStatus(status: RibbonStatus): void {
+  const el = document.getElementById('ribbon-status');
+  if (!el) return;
+  switch (status.kind) {
+    case 'ok':
+      el.textContent = 'リボン連動: 有効（選択数に応じてグレーアウトします）';
+      el.dataset['kind'] = 'info';
+      break;
+    case 'unsupported':
+      el.textContent =
+        'リボン連動: お使いの PowerPoint は RibbonApi 1.1 非対応のため、リボンのグレーアウトは効きません。';
+      el.dataset['kind'] = 'error';
+      break;
+    case 'error':
+      el.textContent = `リボン連動: 失敗（${status.message}）`;
+      el.dataset['kind'] = 'error';
+      break;
+  }
 }
 
 async function refreshButtonStates(): Promise<void> {
@@ -92,6 +113,8 @@ void Office.onReady((info) => {
       void runOperation(operations[id]);
     });
   }
+
+  onRibbonStatusChange(renderRibbonStatus);
 
   Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, () => {
     void refreshButtonStates();
