@@ -22,6 +22,8 @@
     "validate": "npm run typecheck && npm run lint && npm run test",
     "icons": "node scripts/generate-icons.mjs",
     "manifest:validate": "office-addin-manifest validate manifest.xml",
+    "manifest:prod": "node scripts/build-manifest.mjs",
+    "manifest:prod:validate": "npm run manifest:prod && office-addin-manifest validate dist/manifest.xml",
     "start:debug": "office-addin-debugging start manifest.xml",
     "stop:debug": "office-addin-debugging stop manifest.xml"
   },

@@ -42,6 +42,10 @@ function noCacheHeadersPlugin(): Plugin {
 export default defineConfig(async ({ command }) => {
   const https = command === 'serve' ? await readDevCerts() : undefined;
   return {
+    // Relative asset paths in the built HTML so the same `dist/` works
+    // regardless of where it's served — root of localhost during dev,
+    // a sub-path on GitHub Pages, a CDN, etc.
+    base: command === 'build' ? './' : '/',
     plugins: [noCacheHeadersPlugin()],
     server: {
       port: 3000,

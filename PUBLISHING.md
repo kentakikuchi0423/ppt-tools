@@ -20,31 +20,57 @@ A が一般公開向けの本道、B が社内利用向けの本道、C は B �
 
 ### 2. 本番ホスティング
 
-開発時の `https://localhost:3000` は本番では使えません。HTTPS の公開ホストが必要です。本リポジトリでは GitHub Pages を使った無料ホスティング設定を `.github/workflows/deploy-pages.yml` に用意しています（後続タスクで追加予定）。
+開発時の `https://localhost:3000` は本番では使えません。HTTPS の公開ホストが必要です。
 
-代替候補：
+本リポジトリには **GitHub Pages へのデプロイ workflow** が同梱されています（[`.github/workflows/deploy-pages.yml`](./.github/workflows/deploy-pages.yml)）。
 
-- GitHub Pages（無料、リポジトリ単位）
+**初回セットアップ（GitHub 上で 1 回だけ）**:
+
+1. リポジトリ → **Settings** → **Pages** → **Source** を **GitHub Actions** に切り替え。
+2. リポジトリ → **Actions** タブ → 左メニューから **Deploy to GitHub Pages** → **Run workflow** ボタン。
+3. 完了するとアドインが `https://kentakikuchi0423.github.io/ppt-tools/` から配信される。
+
+以降は **Run workflow** をクリックするだけで再デプロイ。
+
+代替ホスティング候補：
+
 - Cloudflare Pages（無料、独自ドメイン可）
 - Azure Static Web Apps（無料枠あり、Microsoft 純正）
 - Vercel / Netlify
 
-ホスティング先 URL（例：`https://kentakikuchi0423.github.io/ppt-tools/`）が確定したら、本番用マニフェストを作成します。
+GitHub Pages 以外を使う場合は、後述の `npm run manifest:prod` を `MANIFEST_HOST=...` 付きで実行してデプロイ先 URL に差し替えたマニフェストを生成してください。
 
 ### 3. 本番用マニフェスト
 
-開発用 `manifest.xml`（localhost を指す）と別に、本番用マニフェストを生成します。差分は基本的に URL のホスト名のみ：
+開発用 `manifest.xml`（localhost を指す）と別に、本番用マニフェストを生成します。差分は URL のホスト名と `<Id>` GUID（dev/prod を別アドインとして PowerPoint に登録するため）。
 
-| 項目 | 開発 | 本番 |
+`scripts/build-manifest.mjs`（`npm run manifest:prod` で実行）が自動でこの差分を当てます：
+
+```bash
+# デフォルト（GitHub Pages 向け、リポジトリに pre-allocated された prod GUID）
+npm run manifest:prod
+# → dist/manifest.xml を生成
+
+# 本番ホスト・GUID・バージョンを差し替えたい場合は環境変数で
+MANIFEST_HOST=https://example.com/path \
+MANIFEST_GUID=00000000-0000-0000-0000-000000000000 \
+MANIFEST_VERSION=1.2.3.0 \
+npm run manifest:prod
+
+# 生成 + バリデーション
+npm run manifest:prod:validate
+```
+
+`MANIFEST_HOST` が `https://localhost:3000` だったり `MANIFEST_GUID` が dev GUID と同じだとスクリプトは exit 1 で停止します（誤って localhost を指す「本番」マニフェストを作るのを防ぐため）。
+
+差分の内訳：
+
+| 項目 | 開発 | 本番（既定） |
 | --- | --- | --- |
-| `SourceLocation` (taskpane) | `https://localhost:3000/taskpane.html` | `https://<host>/taskpane.html` |
-| `Commands.Url` | `https://localhost:3000/commands.html` | `https://<host>/commands.html` |
-| `Taskpane.Url` | 同上 | 同上 |
-| `bt:Image` 各エントリ | `https://localhost:3000/assets/...` | `https://<host>/assets/...` |
-| `AppDomains > AppDomain` | `https://localhost:3000` | `https://<host>` |
-| `<Id>` GUID | 開発用 | **本番用は別 GUID を発行**（dev/prod を別アドインとして登録するため） |
-| `<Version>` | 任意 | 公開ごとに上げる |
-| `SupportUrl` | リポジトリ URL | リポジトリ URL（同じ） |
+| `SourceLocation`、`Commands.Url`、`Taskpane.Url`、`bt:Image`、`AppDomain` | `https://localhost:3000/...` | `https://kentakikuchi0423.github.io/ppt-tools/...` |
+| `<Id>` GUID | `c3f24a1e-...` | `9f4e74b3-...` |
+| `<Version>` | 任意 | 公開ごとに上げる（既定: `1.0.0.0`） |
+| `SupportUrl` | 変更なし | 変更なし |
 
 ### 4. アセット
 
