@@ -153,25 +153,3 @@ button:disabled {
   color: var(--error);
 }
 
-.diagnostic {
-  margin: 0;
-  padding: 6px 8px;
-  border-radius: 4px;
-  background: rgba(33, 108, 196, 0.12);
-  border: 1px solid rgba(33, 108, 196, 0.3);
-  font-size: 11px;
-  color: var(--fg);
-}
-
-.diagnostic[data-kind='error'] {
-  background: rgba(179, 38, 30, 0.12);
-  border-color: rgba(179, 38, 30, 0.4);
-  color: var(--error);
-}
-
-.version {
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--muted);
-  margin-left: 4px;
-}

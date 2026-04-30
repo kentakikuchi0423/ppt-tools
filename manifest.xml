@@ -7,7 +7,7 @@
     xsi:type="TaskPaneApp">
 
   <Id>c3f24a1e-e4a8-4a54-8d26-ff2db8ed9e0e</Id>
-  <Version>1.0.6.0</Version>
+  <Version>1.0.7.0</Version>
   <ProviderName>ppt-tools</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="ppt-tools" />

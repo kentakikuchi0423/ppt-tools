@@ -4,8 +4,7 @@ import { packDown, packLeft, packRight, packUp } from '../core/operations/pack.j
 import { swapPositions } from '../core/operations/swap.js';
 import { LastSelectedResolver } from '../core/resolvers/lastSelected.js';
 import type { OperationResult, Shape } from '../core/types.js';
-import { onRibbonStatusChange, setRibbonEnabled } from '../office/ribbon.js';
-import type { RibbonStatus } from '../office/ribbon.js';
+import { setRibbonEnabled } from '../office/ribbon.js';
 import { applyShapes, getSelectedShapes } from '../office/selection.js';
 import './taskpane.css';
 
@@ -49,36 +48,6 @@ function setStatus(msg: string, kind: 'info' | 'error' = 'info'): void {
   el.textContent = msg;
   el.dataset['kind'] = kind;
 }
-
-function renderRibbonStatus(status: RibbonStatus): void {
-  const el = document.getElementById('ribbon-status');
-  if (!el) return;
-  switch (status.kind) {
-    case 'pending':
-      el.textContent = 'リボン連動: 確認中…';
-      el.dataset['kind'] = 'info';
-      break;
-    case 'ok':
-      el.textContent = 'リボン連動: 有効（選択数に応じてグレーアウトします）';
-      el.dataset['kind'] = 'info';
-      break;
-    case 'unsupported':
-      el.textContent =
-        'リボン連動: お使いの PowerPoint は RibbonApi 1.1 非対応のため、リボンのグレーアウトは効きません。';
-      el.dataset['kind'] = 'error';
-      break;
-    case 'error':
-      el.textContent = `リボン連動: 失敗（${status.message}）`;
-      el.dataset['kind'] = 'error';
-      break;
-  }
-}
-
-// Register the ribbon status listener immediately so the diagnostic line
-// renders even if Office.onReady is slow, fails, or fires with a non-
-// PowerPoint host. The listener fires synchronously with the current
-// status on subscription.
-onRibbonStatusChange(renderRibbonStatus);
 
 async function refreshButtonStates(): Promise<void> {
   let count = 0;
