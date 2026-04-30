@@ -1,10 +1,6 @@
 // Updates the enabled/disabled state of the ppt-tools ribbon controls in
 // response to selection changes, so the user can tell at a glance which
 // operations make sense for the current selection.
-//
-// Office.ribbon.requestUpdate is available on PowerPoint Microsoft 365
-// builds and is missing in older hosts; the helper degrades silently if
-// the API isn't there.
 
 const TAB_ID = 'TabHome';
 const GROUP_ID = 'PptTools.MainGroup';
@@ -18,13 +14,31 @@ const CONTROL_IDS = [
   'PptTools.SwapPositions',
 ] as const;
 
+let warnedNoRibbonApi = false;
+
+function ribbonApiSupported(): boolean {
+  try {
+    return Office.context.requirements.isSetSupported('RibbonApi', '1.1');
+  } catch {
+    return false;
+  }
+}
+
 export async function setRibbonEnabled(enabled: boolean): Promise<void> {
   if (typeof Office === 'undefined') return;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  const ribbon = Office.ribbon as typeof Office.ribbon | undefined;
-  if (!ribbon || typeof ribbon.requestUpdate !== 'function') return;
+
+  if (!ribbonApiSupported()) {
+    if (!warnedNoRibbonApi) {
+      warnedNoRibbonApi = true;
+      console.warn(
+        '[ppt-tools] RibbonApi 1.1 not supported in this Office host — ribbon controls will not grey out.',
+      );
+    }
+    return;
+  }
+
   try {
-    await ribbon.requestUpdate({
+    await Office.ribbon.requestUpdate({
       tabs: [
         {
           id: TAB_ID,
@@ -38,6 +52,6 @@ export async function setRibbonEnabled(enabled: boolean): Promise<void> {
       ],
     });
   } catch (err) {
-    console.warn('ppt-tools: failed to update ribbon state:', err);
+    console.error('[ppt-tools] Office.ribbon.requestUpdate failed:', err);
   }
 }
