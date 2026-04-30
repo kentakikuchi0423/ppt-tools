@@ -76,9 +76,7 @@ npm run manifest:prod:validate
 
 - [ ] **アイコン（本番品質）**: 現状の `scripts/generate-icons.mjs` で生成した PNG はプレースホルダ（青背景 + ASCII グリフ）。AppSource 提出前に**プロのデザイナー作の本番アイコン**に差し替え。要件は 16/32/64/80/96/128 px、PNG、透過背景推奨。
 - [ ] **スクリーンショット**: AppSource 掲載用に 1366×768 px の PNG を 1〜10 枚。実機の PowerPoint 上でリボン／タスクペイン／操作前後の図形配置を撮影。
-- [ ] **アドイン説明文（短文・長文、日英）**:
-  - 短文（〜100 文字）: 「PowerPoint で図形を一発整列・パッキングできるアドイン」
-  - 長文（〜4000 文字）: 機能一覧、使い方、スクリーンショット説明など。`README.md` 冒頭をベースに調整。
+- [ ] **アドイン説明文（短文・長文、日英）**: 下書きは [AppSource 提出用コピー（下書き）](#appsource-提出用コピー下書き) を参照。最終版を Partner Center に貼り付ける。
 
 ### 5. 法務ドキュメント
 
@@ -109,13 +107,129 @@ npm run manifest:prod:validate
 - バグ修正・機能追加のたびに `<Version>` を上げて Partner Center に再提出。
 - ユーザーは PowerPoint 起動時または「アドイン更新の確認」で自動更新を受け取る。
 
+## AppSource 提出用コピー（下書き）
+
+Partner Center の入力欄にそのまま貼り付ける想定の下書き。実際の提出時はリリース内容に合わせて調整してください。
+
+### カテゴリ・属性（Partner Center の選択項目）
+
+- **カテゴリ**: Productivity（生産性）
+- **対応ホスト**: PowerPoint
+- **対応プラットフォーム**: Windows desktop / Mac desktop / Office on the web
+- **対応 Office バージョン**: Microsoft 365（サブスクリプション版）
+- **言語**: 日本語（プライマリ）／英語（セカンダリ）
+
+### 短文（日本語、〜100 文字）
+
+> PowerPoint の図形を一発で整列・配置調整。下／上／左／右に詰める、高さ・幅を揃える、2 図形の位置入替の 7 操作を、リボンと QAT から 1 クリックで。
+
+### 短文（英語、〜100 chars）
+
+> One-click shape alignment for PowerPoint. Pack down/up/left/right, match height/width, swap positions — straight from the ribbon and QAT.
+
+### 長文（日本語、〜4000 文字）
+
+```
+ppt-tools は、PowerPoint 上で「複数図形をピシッと整える」だけのために作られた、シンプルな Office アドインです。手作業でドラッグ＆ドロップしたり、書式コピー → サイズ手入力したりしていた作業を、選択 → 1 クリックに置き換えます。
+
+# できること（7 操作）
+
+- 下に詰める / 上に詰める / 左に詰める / 右に詰める
+  選択中の図形を指定方向に寄せ、隣接する図形どうしの隙間をゼロにします。整列順序は元の座標順を維持します。
+- 高さを揃える
+  選択した複数の図形を、最後に選んだ図形（参照図形）の高さに合わせます。上端は固定。
+- 幅を揃える
+  同様に、参照図形の幅に合わせます。左端は固定。
+- 位置を入れ替える
+  選択した 2 つの図形の `left` / `top` を入れ替えます。サイズや書式は保持します。
+
+すべての操作は PowerPoint 標準の Undo（Ctrl+Z）で 1 回取り消せます。
+
+# 呼び出し方
+
+- リボン: ホームタブの末尾に追加される「ppt-tools」グループから直接クリック。
+- クイックアクセスツールバー (QAT): 各ボタンを右クリック →「クイック アクセス ツール バーに追加」で個別ピン留め。Menu 内の項目（高さを揃える／幅を揃える）も個別に登録できます。
+- タスクペイン: 挿入 → 個人用アドイン → ppt-tools。図形操作 7 ボタンを縦並びで表示。
+
+# 動作環境
+
+- Microsoft 365 の PowerPoint（Windows / Mac / Web）。
+- インターネット接続（Office.js を CDN から読み込みます）。
+- 図形の選択数によって有効になる操作が変わります（例: 詰める = 2 つ以上、入れ替える = 2 つ、高さ・幅を揃える = 2 つ以上で最後の図形が参照）。
+
+# プライバシー・セキュリティ
+
+- 利用者の図形データ・スライド内容は外部に送信しません。
+- 認証も不要、サーバー側のロギングもありません。すべての処理はクライアント側で完結します。
+- 詳細はプライバシーポリシーをご覧ください: https://kentakikuchi0423.github.io/ppt-tools/PRIVACY.md
+
+# ライセンス・サポート
+
+- MIT License で配布しています。
+- 不具合報告・機能要望は GitHub の Issue Tracker にお願いします。
+  https://github.com/kentakikuchi0423/ppt-tools/issues
+```
+
+### 長文（英語、〜4000 chars）
+
+```
+ppt-tools is a focused PowerPoint add-in that turns shape-alignment chores into one click. Stop dragging shapes pixel-by-pixel or retyping sizes — select, click, done.
+
+# What it does (7 operations)
+
+- Pack down / up / left / right
+  Pushes the selected shapes toward the chosen edge, removing every gap between adjacent shapes. Original ordering is preserved.
+- Match height
+  Resizes the selected shapes to match the height of the last-selected (reference) shape. Top edge is anchored.
+- Match width
+  Same idea, anchored on the left edge.
+- Swap positions
+  Swaps the `left` / `top` coordinates of two selected shapes. Sizes and formatting are preserved.
+
+Every operation is a single Undo step (Ctrl+Z) in PowerPoint.
+
+# Where to find it
+
+- Ribbon: a "ppt-tools" group is added to the Home tab.
+- Quick Access Toolbar: right-click any button (including individual menu items for Match height / Match width) and pin it.
+- Task pane: Insert → My Add-ins → ppt-tools — the same 7 buttons in a vertical layout.
+
+# Requirements
+
+- PowerPoint on Microsoft 365 (Windows, Mac, or Web).
+- Internet connection (Office.js is loaded from the Microsoft CDN).
+- Some commands require a minimum number of selected shapes (e.g. Pack ≥ 2, Swap = 2, Match height/width ≥ 2 with the last selection acting as the reference).
+
+# Privacy & security
+
+- No shape data, slide content, or telemetry leaves your machine.
+- No accounts, no server-side logging — everything runs in the add-in's WebView.
+- Full policy: https://kentakikuchi0423.github.io/ppt-tools/PRIVACY.md
+
+# License & support
+
+- Distributed under the MIT License.
+- Bug reports and feature requests: https://github.com/kentakikuchi0423/ppt-tools/issues
+```
+
+### 検索キーワード（AppSource search keywords）
+
+`align`, `alignment`, `pack`, `distribute`, `arrange`, `shapes`, `swap`, `resize`, `match height`, `match width`, `整列`, `配置`, `詰める`, `揃える`, `入れ替える`, `図形`
+
+### サポート URL（必須）
+
+- リポジトリ: https://github.com/kentakikuchi0423/ppt-tools
+- Issue Tracker（サポート窓口）: https://github.com/kentakikuchi0423/ppt-tools/issues
+- プライバシーポリシー: https://kentakikuchi0423.github.io/ppt-tools/PRIVACY.md
+
 ## 次のアクションとして残っているもの
 
-- [ ] GitHub Pages デプロイワークフロー追加
-- [ ] 本番用マニフェスト生成スクリプト
+- [x] GitHub Pages デプロイワークフロー追加
+- [x] 本番用マニフェスト生成スクリプト
+- [x] AppSource 提出文章の下書き作成（[AppSource 提出用コピー（下書き）](#appsource-提出用コピー下書き)）
 - [ ] 本番品質のアイコン作成（デザイナー作業）
 - [ ] スクリーンショット撮影（実機の PowerPoint で）
-- [ ] AppSource 提出文章の本文作成
 - [ ] Partner Center アカウント開設
+- [ ] GitHub Pages の有効化（Settings → Pages → Source: GitHub Actions）+ 初回デプロイ実行
 
 これらはこのドキュメント末尾のチェックリストとして管理してください。
