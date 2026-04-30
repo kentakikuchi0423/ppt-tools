@@ -6,9 +6,14 @@ PowerPoint Office アドイン（VBA ではなく Office.js）。図形操作の
 - 選択図形の高さ・幅を参照図形に揃える
 - 2 つの図形の位置を入れ替える（`left` / `top` のみ。サイズは保持）
 
+呼び出し面は 2 つあります：
+
+- **タスクペイン**（PowerPoint 右側の作業ウィンドウ） — 操作ボタン 7 個。**挿入** タブ → **個人用アドイン** → **ppt-tools** で開きます。
+- **ホームタブのリボン** — `ppt-tools` グループに 6 control（4 方向「詰める」+ 高さ/幅 Menu + 位置を入れ替える）。各 control は **クイック アクセス ツール バー（QAT）** に個別ピン留め可能（Menu 内の Item も登録可）。
+
 座標計算ロジックは `src/core/` に純粋関数として実装し、Office.js に依存しません。Vitest で完全にユニットテスト可能です。Office.js に依存するアダプタコードは `src/office/` に分離されています。
 
-実装の進行状況は [`TASKS.md`](./TASKS.md) を参照してください。
+実装の進行状況は [`TASKS.md`](./TASKS.md)、機能・非機能要件は [`REQUIREMENTS.md`](./REQUIREMENTS.md) を参照してください。
 
 ## クイックスタート（Windows ユーザー向け）
 
@@ -18,8 +23,6 @@ PowerPoint で動作確認したいだけなら、以下の手順だけで OK �
 2. このリポジトリを Windows のフォルダに clone（例：`C:\Users\<あなた>\Documents\dev\ppt-tools`）。
 3. リポジトリ直下の **`start.cmd` をダブルクリック**。
 
-タスクペインが古い表示のまま動かない・キャッシュが疑わしい場合は、代わりに **`reload.cmd`** をダブルクリック。Office プロセスの強制終了 + アドインキャッシュ全削除 + 再起動を一括で行います。
-
 `start.cmd` が自動で：
 
 1. Node.js のバージョン確認
@@ -27,7 +30,14 @@ PowerPoint で動作確認したいだけなら、以下の手順だけで OK �
 3. 開発用証明書のインストール（初回のみ。**UAC ダイアログが出たら「はい」**）
 4. dev サーバ起動 + アドインのサイドロード + PowerPoint 起動
 
-PowerPoint が開いたらリボンの **ホーム** タブ右端の **ppt-tools** グループから **Open ppt-tools** をクリックしてタスクペインを開いてください。終了するときは `start.cmd` のウィンドウを閉じる、または別の PowerShell で `npm run stop:debug`。
+PowerPoint が開いたら：
+
+- リボンの **ホーム** タブ右端に追加された **ppt-tools** グループから操作ボタンを直接クリック、または
+- 右側のタスクペイン（作業ウィンドウ）を開く: **挿入** タブ → **個人用アドイン** → **ppt-tools**（タスクペイン上部の📌ピン留めボタンで常駐化できます）
+
+終了するときは `start.cmd` のウィンドウを閉じる、または別の PowerShell で `npm run stop:debug`。
+
+タスクペインやリボンが古い表示のまま動かない・キャッシュが疑わしい場合は、代わりに **`reload.cmd`** をダブルクリック。Office プロセスの強制終了 + アドインキャッシュ全削除 + 再起動を一括で行います。
 
 ## 必要環境
 
@@ -77,7 +87,7 @@ npx office-addin-dev-certs install   # UAC ダイアログで「はい」
 npm run start:debug
 ```
 
-`npm run start:debug` は dev サーバ（`https://localhost:3000`）の起動 → アドインのサイドロード → PowerPoint の起動までを一括で行います。PowerPoint が立ち上がったらリボンの **ホーム** タブにある **ppt-tools** グループの **Open ppt-tools** ボタンをクリックすればタスクペインが開きます。
+`npm run start:debug` は dev サーバ（`https://localhost:3000`）の起動 → アドインのサイドロード → PowerPoint の起動までを一括で行います。PowerPoint が立ち上がったらリボンの **ホーム** タブの **ppt-tools** グループから操作ボタンを直接クリック、またはタスクペイン（**挿入 → 個人用アドイン → ppt-tools**）を開いて使ってください。
 
 終了するときは `npm run stop:debug`。
 
@@ -86,7 +96,7 @@ npm run start:debug
 | スクリプト                  | 内容                                                                                                                              |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | `npm run dev`               | Vite 開発サーバを `https://localhost:3000` で起動（dev-certs インストール時のみ HTTPS。未インストール時は HTTP にフォールバック） |
-| `npm run build`             | `dist/` に `taskpane.html` / `commands.html` を含む本番ビルドを出力                                                               |
+| `npm run build`             | `dist/` に `taskpane.html` / `commands.html` / `dialog.html` を含む本番ビルドを出力                                               |
 | `npm run typecheck`         | `tsc --noEmit` を `src/` と `tests/` に対して実行                                                                                 |
 | `npm run lint`              | ESLint をワークスペース全体に実行                                                                                                 |
 | `npm run lint:fix`          | ESLint を `--fix` 付きで実行                                                                                                      |
@@ -107,21 +117,30 @@ npm run start:debug
 .
 ├── .devcontainer/
 │   └── devcontainer.json        # Node 22 イメージ + postCreateCommand
-├── manifest.xml                 # PowerPoint アドインのマニフェスト
+├── manifest.xml                 # PowerPoint アドインのマニフェスト（V1.0 fallback + V1.1 共有ランタイム）
+├── start.cmd                    # Windows ワンクリック起動
+├── reload.cmd                   # ワンクリック再起動（プロセス kill + キャッシュ削除 + start.cmd 相当）
 ├── taskpane.html                # タスクペイン HTML エントリ
-├── commands.html                # FunctionFile HTML エントリ（リボンコマンド用）
+├── commands.html                # FunctionFile HTML エントリ（V1.0 fallback 用）
+├── dialog.html                  # リボン経由のエラー表示用ポップアップ
 ├── public/
 │   └── assets/                  # manifest 参照のアイコン PNG（npm run icons で生成）
 ├── scripts/
-│   └── generate-icons.mjs       # プレースホルダ PNG ジェネレータ
+│   ├── generate-icons.mjs       # 8 種類のアイコン PNG ジェネレータ
+│   ├── setup-windows.ps1        # start.cmd の中身
+│   └── reload-windows.ps1       # reload.cmd の中身
 ├── src/
 │   ├── core/                    # 純粋ロジック。Office.js 非依存。Vitest 100% テスト。
-│   │   ├── operations/          # pack / alignHeights / swap
+│   │   ├── operations/          # pack / alignHeights / alignWidths / swap
 │   │   ├── resolvers/           # LastSelectedResolver / StoredReferenceResolver
 │   │   └── types.ts
 │   ├── office/                  # Office.js アダプタ。PowerPoint.run / Office.context を呼ぶ唯一の層。
-│   ├── taskpane/                # タスクペイン UI のスクリプト
-│   └── commands/                # FunctionFile のスクリプト
+│   │   ├── actions.ts           # registerRibbonActions() — リボン commands の共通登録
+│   │   ├── ribbon.ts            # Office.ribbon.requestUpdate のラッパ（grayout 連動）
+│   │   └── selection.ts         # getSelectedShapes / applyShapes
+│   ├── taskpane/                # タスクペイン UI（共有ランタイム経路でも使われる）
+│   ├── commands/                # FunctionFile（V1.0 fallback 経路でリボンクリック時にロード）
+│   └── dialog/                  # ポップアップダイアログのスクリプト
 ├── tests/                       # Vitest。src/core のみ import する。
 ├── eslint.config.js             # flat config + typescript-eslint strict-type-checked + prettier
 ├── tsconfig.json                # TS strict（+ noUncheckedIndexedAccess、exactOptionalPropertyTypes）
@@ -166,12 +185,12 @@ npm run start:debug
 
 2. PowerPoint 上で：
    - **挿入 → アドインの取得 → 共有フォルダー → ppt-tools → 追加**
-   - リボンの **ホーム** タブに **ppt-tools** グループが追加され、**Open ppt-tools** ボタンが現れます。
-   - クリックでタスクペインが開きます。
+   - リボンの **ホーム** タブに **ppt-tools** グループが追加され、6 control（4 方向「詰める」+ 高さ/幅 Menu + 位置を入れ替える）が並びます。
+   - タスクペイン（作業ウィンドウ）を開きたい場合は **挿入 → 個人用アドイン → ppt-tools**。
 
 ### 開発ループ
 
-タスクペインは Vite の HMR でリロードされます。PowerPoint がタスクペインを強くキャッシュすることがあるため、変更が反映されない場合はアドインペインを一度閉じて開き直してください。
+タスクペインは Vite の HMR でリロードされます。PowerPoint がタスクペインを強くキャッシュすることがあるため、変更が反映されない場合はアドインペインを一度閉じて開き直す、または `reload.cmd` で全キャッシュを削除して再起動してください。
 
 共有フォルダ経由のサイドロードに関する Microsoft 公式ドキュメントは Microsoft Learn を参照してください（検索キーワード: "Sideload Office Add-ins for testing from a network share"）。
 

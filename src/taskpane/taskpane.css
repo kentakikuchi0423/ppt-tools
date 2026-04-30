@@ -152,4 +152,3 @@ button:disabled {
 #status[data-kind='error'] {
   color: var(--error);
 }
-

@@ -71,11 +71,14 @@ async function sleep(ms: number): Promise<void> {
 async function showPopup(message: string): Promise<void> {
   const popupId = String(Date.now());
   broadcastNewPopup(popupId);
-  await sleep(180);
-  for (let attempt = 0; attempt < 4; attempt++) {
-    const opened = await tryOpenDialog(message, popupId);
-    if (opened) return;
-    await sleep(300);
+  // Try opening immediately. If no other dialog is currently open this
+  // succeeds and the user sees the popup with no artificial delay. If a
+  // previous dialog is still being dismissed, the open fails — give it a
+  // short window to react to the broadcast above and retry a few times.
+  if (await tryOpenDialog(message, popupId)) return;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await sleep(200);
+    if (await tryOpenDialog(message, popupId)) return;
   }
   console.error('[ppt-tools] failed to open popup after retries');
 }
