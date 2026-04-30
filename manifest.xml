@@ -7,7 +7,7 @@
     xsi:type="TaskPaneApp">
 
   <Id>c3f24a1e-e4a8-4a54-8d26-ff2db8ed9e0e</Id>
-  <Version>1.0.1.0</Version>
+  <Version>1.0.3.0</Version>
   <ProviderName>ppt-tools</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="ppt-tools" />
@@ -44,6 +44,15 @@
 
           <ExtensionPoint xsi:type="PrimaryCommandSurface">
             <OfficeTab id="TabHome">
+              <!--
+                PowerPoint sideloaded TaskPaneApps render only the first
+                Group in an OfficeTab and cap each group at 6 controls.
+                Reserve all six slots for the operations the user is most
+                likely to pin to the Quick Access Toolbar (4 pack + 2
+                align). "Open ppt-tools" lives under
+                Insert > My Add-ins > ppt-tools, and Swap positions stays
+                in the task pane.
+              -->
               <Group id="PptTools.MainGroup">
                 <Label resid="PptTools.MainGroup.Label" />
                 <Icon>
@@ -51,45 +60,7 @@
                   <bt:Image size="32" resid="Icon.32x32" />
                   <bt:Image size="80" resid="Icon.80x80" />
                 </Icon>
-                <Control xsi:type="Button" id="PptTools.OpenButton">
-                  <Label resid="PptTools.OpenButton.Label" />
-                  <Supertip>
-                    <Title resid="PptTools.OpenButton.Label" />
-                    <Description resid="PptTools.OpenButton.Tooltip" />
-                  </Supertip>
-                  <Icon>
-                    <bt:Image size="16" resid="Icon.16x16" />
-                    <bt:Image size="32" resid="Icon.32x32" />
-                    <bt:Image size="80" resid="Icon.80x80" />
-                  </Icon>
-                  <Action xsi:type="ShowTaskpane">
-                    <TaskpaneId>PptToolsTaskpane</TaskpaneId>
-                    <SourceLocation resid="Taskpane.Url" />
-                  </Action>
-                </Control>
-                <Control xsi:type="Button" id="PptTools.SwapPositions">
-                  <Label resid="PptTools.SwapPositions.Label" />
-                  <Supertip>
-                    <Title resid="PptTools.SwapPositions.Label" />
-                    <Description resid="PptTools.SwapPositions.Tooltip" />
-                  </Supertip>
-                  <Icon>
-                    <bt:Image size="16" resid="Icon.Swap.16x16" />
-                    <bt:Image size="32" resid="Icon.Swap.32x32" />
-                    <bt:Image size="80" resid="Icon.Swap.80x80" />
-                  </Icon>
-                  <Action xsi:type="ExecuteFunction">
-                    <FunctionName>swapPositions</FunctionName>
-                  </Action>
-                </Control>
-              </Group>
-              <Group id="PptTools.PackGroup">
-                <Label resid="PptTools.PackGroup.Label" />
-                <Icon>
-                  <bt:Image size="16" resid="Icon.PackDown.16x16" />
-                  <bt:Image size="32" resid="Icon.PackDown.32x32" />
-                  <bt:Image size="80" resid="Icon.PackDown.80x80" />
-                </Icon>
+
                 <Control xsi:type="Button" id="PptTools.PackDown">
                   <Label resid="PptTools.PackDown.Label" />
                   <Supertip>
@@ -105,6 +76,7 @@
                     <FunctionName>packDown</FunctionName>
                   </Action>
                 </Control>
+
                 <Control xsi:type="Button" id="PptTools.PackUp">
                   <Label resid="PptTools.PackUp.Label" />
                   <Supertip>
@@ -120,6 +92,7 @@
                     <FunctionName>packUp</FunctionName>
                   </Action>
                 </Control>
+
                 <Control xsi:type="Button" id="PptTools.PackLeft">
                   <Label resid="PptTools.PackLeft.Label" />
                   <Supertip>
@@ -135,6 +108,7 @@
                     <FunctionName>packLeft</FunctionName>
                   </Action>
                 </Control>
+
                 <Control xsi:type="Button" id="PptTools.PackRight">
                   <Label resid="PptTools.PackRight.Label" />
                   <Supertip>
@@ -150,14 +124,7 @@
                     <FunctionName>packRight</FunctionName>
                   </Action>
                 </Control>
-              </Group>
-              <Group id="PptTools.AlignGroup">
-                <Label resid="PptTools.AlignGroup.Label" />
-                <Icon>
-                  <bt:Image size="16" resid="Icon.AlignHeights.16x16" />
-                  <bt:Image size="32" resid="Icon.AlignHeights.32x32" />
-                  <bt:Image size="80" resid="Icon.AlignHeights.80x80" />
-                </Icon>
+
                 <Control xsi:type="Button" id="PptTools.AlignHeights">
                   <Label resid="PptTools.AlignHeights.Label" />
                   <Supertip>
@@ -173,6 +140,7 @@
                     <FunctionName>alignHeights</FunctionName>
                   </Action>
                 </Control>
+
                 <Control xsi:type="Button" id="PptTools.AlignWidths">
                   <Label resid="PptTools.AlignWidths.Label" />
                   <Supertip>
@@ -218,9 +186,6 @@
         <bt:Image id="Icon.AlignWidths.16x16" DefaultValue="https://localhost:3000/assets/icon-align-widths-16.png" />
         <bt:Image id="Icon.AlignWidths.32x32" DefaultValue="https://localhost:3000/assets/icon-align-widths-32.png" />
         <bt:Image id="Icon.AlignWidths.80x80" DefaultValue="https://localhost:3000/assets/icon-align-widths-80.png" />
-        <bt:Image id="Icon.Swap.16x16" DefaultValue="https://localhost:3000/assets/icon-swap-16.png" />
-        <bt:Image id="Icon.Swap.32x32" DefaultValue="https://localhost:3000/assets/icon-swap-32.png" />
-        <bt:Image id="Icon.Swap.80x80" DefaultValue="https://localhost:3000/assets/icon-swap-80.png" />
       </bt:Images>
       <bt:Urls>
         <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://learn.microsoft.com/office/dev/add-ins/" />
@@ -230,10 +195,6 @@
       <bt:ShortStrings>
         <bt:String id="GetStarted.Title" DefaultValue="ppt-tools is ready." />
         <bt:String id="PptTools.MainGroup.Label" DefaultValue="ppt-tools" />
-        <bt:String id="PptTools.PackGroup.Label" DefaultValue="詰める" />
-        <bt:String id="PptTools.AlignGroup.Label" DefaultValue="揃える" />
-        <bt:String id="PptTools.OpenButton.Label" DefaultValue="ppt-tools を開く" />
-        <bt:String id="PptTools.SwapPositions.Label" DefaultValue="位置を入れ替える" />
         <bt:String id="PptTools.PackDown.Label" DefaultValue="下に詰める" />
         <bt:String id="PptTools.PackUp.Label" DefaultValue="上に詰める" />
         <bt:String id="PptTools.PackLeft.Label" DefaultValue="左に詰める" />
@@ -243,8 +204,6 @@
       </bt:ShortStrings>
       <bt:LongStrings>
         <bt:String id="GetStarted.Description" DefaultValue="Open the ppt-tools task pane to pack, align, or swap shapes." />
-        <bt:String id="PptTools.OpenButton.Tooltip" DefaultValue="ppt-tools のタスクペインを開きます。" />
-        <bt:String id="PptTools.SwapPositions.Tooltip" DefaultValue="選択中のちょうど 2 つの図形の位置（left/top）を入れ替えます。サイズは保持。" />
         <bt:String id="PptTools.PackDown.Tooltip" DefaultValue="選択中の図形を下端へ詰めます（最も下の図形を固定し、上の図形が下方向に詰まる）。" />
         <bt:String id="PptTools.PackUp.Tooltip" DefaultValue="選択中の図形を上端へ詰めます（最も上の図形を固定し、下の図形が上方向に詰まる）。" />
         <bt:String id="PptTools.PackLeft.Tooltip" DefaultValue="選択中の図形を左端へ詰めます（最も左の図形を固定し、右の図形が左方向に詰まる）。" />
