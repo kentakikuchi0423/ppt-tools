@@ -1,9 +1,11 @@
 name: Deploy to GitHub Pages
 
 # Builds the production add-in and deploys it to GitHub Pages so the
-# manifest in dist/manifest.xml points at a real public HTTPS host. The
-# resulting URL (https://<owner>.github.io/<repo>/) is what AppSource and
-# Trusted-Catalog sideloads will fetch.
+# manifest in dist/manifest.xml points at a real public HTTPS host.
+# Recipients download manifest.xml from the deployed URL, register the
+# containing folder in PowerPoint's Trust Center as a trusted catalog,
+# then add the add-in via Insert → My Add-ins → Shared Folder. See
+# INSTALL.md for the recipient-side flow.
 #
 # Manual trigger via the Actions tab. Requires the repo to have GitHub
 # Pages set to "GitHub Actions" as the source (Settings → Pages).
