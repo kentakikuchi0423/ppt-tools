@@ -74,10 +74,10 @@ try {
   Write-Step 'Releasing port 3000 if a previous run left it occupied'
   $stale = Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue |
     Select-Object -ExpandProperty OwningProcess -Unique
-  foreach ($pid in $stale) {
-    if ($pid -gt 0) {
-      Write-Host "  killing stale process on port 3000 (PID $pid)"
-      Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
+  foreach ($staleProcessId in $stale) {
+    if ($staleProcessId -gt 0) {
+      Write-Host "  killing stale process on port 3000 (PID $staleProcessId)"
+      Stop-Process -Id $staleProcessId -Force -ErrorAction SilentlyContinue
     }
   }
 
